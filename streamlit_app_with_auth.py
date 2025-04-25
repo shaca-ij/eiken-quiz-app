@@ -9,15 +9,25 @@ import streamlit_authenticator as stauth
 # --- 初期設定 ---
 USER_HISTORY_DIR = "user_history"
 
-# --- ユーザー情報（仮パスワードは全員1234） ---
-names = ['Student One', 'Student Two', 'Student Three']
-usernames = ['student1', 'student2', 'student3']
-passwords = ['1234', '1234', '1234']  # 平文で仮登録（本番はハッシュ化推奨）
+# --- 正しいユーザー情報形式 ---
+usernames = ["student1", "student2", "student3"]
+names = ["Student One", "Student Two", "Student Three"]
+passwords = ["1234", "1234", "1234"]  # 仮パスワード（本番ではハッシュ保存）
 
 hashed_passwords = stauth.Hasher(passwords).generate()
 
+credentials = {
+    "usernames": {
+        username: {
+            "name": name,
+            "password": hashed
+        }
+        for username, name, hashed in zip(usernames, names, hashed_passwords)
+    }
+}
+
 authenticator = stauth.Authenticate(
-    dict(zip(usernames, [{'name': n, 'password': p} for n, p in zip(names, hashed_passwords)])),
+    credentials,
     "eiken_quiz_app",
     "auth_cookie_secret",
     cookie_expiry_days=1
@@ -31,7 +41,6 @@ elif authentication_status is None:
     st.warning("ユーザー名とパスワードを入力してください。")
 elif authentication_status:
     st.success(f"{name} さん、ようこそ！")
-
     authenticator.logout("ログアウト", "sidebar")
 
     st.title("📘 英検単語クイズ")
@@ -132,6 +141,6 @@ elif authentication_status:
                     score += 1
 
             st.success(f"あなたのスコア: {score} / {len(st.session_state['quiz'])}")
-            save_json(mistake_path, new_mistakes)
             prev_history = load_json(history_path)
             save_json(history_path, prev_history + history_log)
+            save_json(mistake_path, new_mistakes)
