@@ -2,149 +2,93 @@
 import streamlit as st
 import pandas as pd
 import random
-import json
-import os
-import streamlit_authenticator as stauth
+from google.oauth2.service_account import Credentials
+import gspread
 
-# --- 初期設定 ---
-USER_HISTORY_DIR = "user_history"
+# --- Google Sheets 認証設定 ---
+credentials = Credentials.from_service_account_info(st.secrets["gcp_service_account"])
+gc = gspread.authorize(credentials)
+SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit#gid=0"
+worksheet = gc.worksheet("履歴")
 
-# --- 正しいユーザー情報形式 ---
-usernames = ["student1", "student2", "student3"]
-names = ["Student One", "Student Two", "Student Three"]
-passwords = ["1234", "1234", "1234"]
+# --- データ読込 ---
+df = pd.read_csv("words.csv")
 
-hashed_passwords = stauth.Hasher(passwords).generate()
+# --- モード選択 ---
+st.title("英検単語クイズ")
+mode = st.radio("モードを選んでください", ("通常モード", "復習モード"))
 
-credentials = {
-    "usernames": {
-        username: {
-            "name": name,
-            "password": hashed
-        }
-        for username, name, hashed in zip(usernames, names, hashed_passwords)
-    }
-}
+# --- 過去の間違いデータ読込 ---
+if "mistakes" not in st.session_state:
+    st.session_state.mistakes = []
 
-authenticator = stauth.Authenticate(
-    credentials,
-    "eiken_quiz_app",
-    "auth_cookie_secret",
-    cookie_expiry_days=1
-)
-
-name, authentication_status, username = authenticator.login("ログイン", "main")
-
-if authentication_status is False:
-    st.error("ユーザー名またはパスワードが違います。")
-elif authentication_status is None:
-    st.warning("ユーザー名とパスワードを入力してください。")
-elif authentication_status:
-    st.success(f"{name} さん、ようこそ！")
-    authenticator.logout("ログアウト", "sidebar")
-
-    st.title("📘 英検単語クイズ")
-
-    df = pd.read_csv("words.csv", encoding="utf-8-sig")
-
-    os.makedirs(USER_HISTORY_DIR, exist_ok=True)
-    history_path = os.path.join(USER_HISTORY_DIR, f"{username}_history.json")
-    mistake_path = os.path.join(USER_HISTORY_DIR, f"{username}_mistakes.json")
-
-    def load_json(filepath):
-        if os.path.exists(filepath):
-            with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
-        return []
-
-    def save_json(filepath, data):
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-
-    mode = st.radio("モードを選択してください", ["クイズを解く", "復習モード"])
-
-    if mode == "復習モード":
-        history = pd.DataFrame(load_json(history_path))
-        if history.empty:
-            st.warning("まだ履歴がありません。クイズを解いてください。")
-            st.stop()
-
-        summary = history.groupby("word").agg(
-            attempts=("correct", "count"),
-            corrects=("correct", "sum")
-        ).reset_index()
-        summary["accuracy"] = (summary["corrects"] / summary["attempts"] * 100).round(1)
-
-        max_acc = st.slider("正答率がこの値以下の単語を復習（%）", 0, 100, 60)
-
-        low_accuracy_words = summary[summary["accuracy"] <= max_acc]["word"].tolist()
-        quiz_base = df[df["word"].isin(low_accuracy_words)].copy()
-
-        if quiz_base.empty:
-            st.warning("指定された正答率以下の単語はありません。")
-            st.stop()
-    else:
-        quiz_base = df.copy()
-
-    if len(quiz_base) == 0:
-        st.error("出題できる問題がありません。")
+# --- 復習モード用データ準備 ---
+if mode == "復習モード":
+    if not st.session_state.mistakes:
+        st.warning("復習対象の間違いデータがありません。通常モードを試してください。")
         st.stop()
-
-    max_questions = len(quiz_base)
-    if max_questions == 1:
-        quiz_size = 1
-        st.info("出題数は1問のみです。")
     else:
-        quiz_size = st.slider("出題数を選んでください", 1, max_questions, min(5, max_questions), key="quiz_size_slider")
+        quiz_base = pd.DataFrame(st.session_state.mistakes)
+else:
+    quiz_base = df.copy()
 
-    if st.button("▶ クイズを始める"):
-        selected = quiz_base.sample(quiz_size).to_dict(orient="records")
-        for q in selected:
-            q["shuffled_choices"] = random.sample(q["choices"].split("|"), 4)
-        st.session_state["quiz"] = selected
-        st.session_state["answers"] = {}
+# --- 出題数選択 ---
+max_questions = len(quiz_base)
+if max_questions == 0:
+    st.error("出題できる問題がありません。")
+    st.stop()
 
-    if "quiz" in st.session_state:
-        st.subheader("📝 問題")
+quiz_size = st.slider("出題数を選んでください", 1, max_questions, min(5, max_questions), key="quiz_size_slider")
 
-        for i, q in enumerate(st.session_state["quiz"]):
-            st.markdown(f"**Q{i+1}: {q['sentence_with_blank']}**")
-            user_answer = st.radio(
-                f"選択肢を選んでください - Q{i+1}",
-                q["shuffled_choices"],
-                key=f"answer_{i}"
-            )
-            st.session_state["answers"][i] = user_answer
+# --- クイズ開始ボタン ---
+if st.button("▶ クイズを始める", key="start_quiz"):
+    selected = quiz_base.sample(quiz_size).to_dict(orient="records")
+    for q in selected:
+        q["shuffled_choices"] = random.sample(q["choices"].split("|"), 4)
+    st.session_state.quiz = selected
+    st.session_state.answers = {}
+    st.session_state.score = 0
+    st.session_state.quiz_mode = mode
 
-        if st.button("✅ 答え合わせ"):
-            score = 0
-            new_mistakes = []
-            history_log = []
+# --- クイズ実施画面 ---
+if "quiz" in st.session_state:
+    with st.form("quiz_form"):
+        for idx, q in enumerate(st.session_state.quiz):
+            st.subheader(f"Q{idx+1}: {q['sentence_with_blank']}")
+            choice = st.radio("選択肢", q["shuffled_choices"], key=f"q{idx}")
+            st.session_state.answers[idx] = choice
+        submitted = st.form_submit_button("解答する")
 
-            st.subheader("📊 結果")
+    if submitted:
+        score = 0
+        mistakes = []
+        for idx, q in enumerate(st.session_state.quiz):
+            user_answer = st.session_state.answers.get(idx)
+            correct_answer = q["answer"]
+            if user_answer == correct_answer:
+                score += 1
+            else:
+                mistakes.append(q)
+            # --- スプレッドシートに結果保存 ---
+            worksheet.append_row([
+                st.session_state.get("user", "unknown_user"),
+                q["word"],
+                user_answer,
+                correct_answer,
+                "〇" if user_answer == correct_answer else "✕"
+            ])
 
-            for i, q in enumerate(st.session_state["quiz"]):
-                correct = q["correct"]
-                user = st.session_state["answers"].get(i, "")
-                is_correct = user == correct
+        st.success(f"スコア: {score}/{len(st.session_state.quiz)}")
 
-                st.markdown(f"**Q{i+1}: {q['sentence_with_blank']}**")
-                st.write(f"あなたの答え: {user} → {'✅ 正解' if is_correct else f'❌ 不正解（正解は: {correct}）'}")
-                st.write(f"意味: {q['meaning_jp']}")
-                st.write(f"和訳: {q['sentence_jp']}")
-                st.markdown("---")
+        # 間違えた問題だけ保存
+        if st.session_state.quiz_mode == "通常モード":
+            st.session_state.mistakes = mistakes
+        elif st.session_state.quiz_mode == "復習モード":
+            st.session_state.mistakes = mistakes  # 復習モードでもさらに間違えたものだけ残す
 
-                history_log.append({
-                    "word": q["word"],
-                    "correct": is_correct
-                })
-
-                if not is_correct:
-                    new_mistakes.append(q)
-                else:
-                    score += 1
-
-            st.success(f"あなたのスコア: {score} / {len(st.session_state['quiz'])}")
-            prev_history = load_json(history_path)
-            save_json(history_path, prev_history + history_log)
-            save_json(mistake_path, new_mistakes)
+        # --- 復習モードへボタン ---
+        if mistakes:
+            if st.button("🔁 復習モードに進む"):
+                st.experimental_rerun()
+        else:
+            st.info("すべて正解しました！復習モードはありません。")
