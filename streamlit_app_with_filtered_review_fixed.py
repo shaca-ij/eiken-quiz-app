@@ -1,15 +1,18 @@
+
 import streamlit as st
 import pandas as pd
 import random
 import gspread
-from google.oauth2.service_account import Credentials
+import json
+from google.oauth2 import service_account
 
 # Google Sheets認証
 scope = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
-credentials = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
+service_account_info = json.loads(st.secrets["gcp_service_account_json"])
+credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=scope)
 gc = gspread.authorize(credentials)
 
 # スプレッドシートとワークシートを開く
