@@ -1,4 +1,4 @@
-﻿id,word,correct,choices,sentence_with_blank,meaning_jp,sentence_jp
+﻿id,word,answer,choices,sentence_with_blank,meaning_jp,sentence_jp
 1,finish,finishes,loses|finishes|breaks|hates,She always ________ her homework before dinner.,終える,彼女はいつも夕食前に宿題を終える。
 2,invite,invite,invite|protect|explain|decide,I will ________ my friends to my birthday party.,招待する,私は誕生日パーティーに友達を招待します。
 3,borrow,borrow,borrow|lend|show|find,Can I ________ your pen for a moment?,借りる,ちょっとの間、あなたのペンを借りてもいいですか？
