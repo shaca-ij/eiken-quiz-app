@@ -9,28 +9,7 @@ import streamlit_authenticator as stauth
 # ==================== 認証設定 ====================
 st.set_page_config(page_title="英検クイズ", page_icon="📝")
 
-# 認証ユーザー情報
-usernames = ["student1", "student2", "student3"]
-passwords = ["1234", "1234", "1234"]
-hashed_passwords = stauth.Hasher(passwords).generate()
-
-authenticator = stauth.Authenticate(
-    {"usernames": {u: {"email": f"{u}@example.com", "name": u, "password": p}
-    for u, p in zip(usernames, hashed_passwords)}},
-    "eiken_quiz_app", "abcdef", cookie_expiry_days=1
-)
-name, authentication_status, username = authenticator.login("ログイン", "main")
-
-if not authentication_status:
-    st.error("ユーザー名またはパスワードが違います")
-    st.stop()
-if authentication_status is None:
-    st.warning("ユーザー名とパスワードを入力してください")
-    st.stop()
-
-# ==================== スプレッドシート接続設定 ====================
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-service_account_info = json.loads(st.secrets["gcp_service_account_json"])
+# 新しい認証方式に対応
 credentials = {
     "usernames": {
         "student1": {
@@ -56,6 +35,19 @@ authenticator = stauth.Authenticate(
 )
 
 name, authentication_status, username = authenticator.login("ログイン", "main")
+
+if not authentication_status:
+    st.error("ユーザー名またはパスワードが違います")
+    st.stop()
+if authentication_status is None:
+    st.warning("ユーザー名とパスワードを入力してください")
+    st.stop()
+
+# ==================== スプレッドシート接続設定 ====================
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+service_account_info = json.loads(st.secrets["gcp_service_account_json"])
+credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=scope)
+gc = gspread.authorize(credentials)
 
 SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit#gid=0"
 spreadsheet = gc.open_by_url(SPREADSHEET_URL)
