@@ -16,7 +16,8 @@ credentials = service_account.Credentials.from_service_account_info(
 gc = gspread.authorize(credentials)
 
 # あなたのスプレッドシートURLに変更してください
-SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c"
+SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c"
+
 spreadsheet = gc.open_by_url(SPREADSHEET_URL)
 worksheet = spreadsheet.worksheet("履歴")
 
