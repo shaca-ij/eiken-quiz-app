@@ -31,8 +31,31 @@ if authentication_status is None:
 # ==================== スプレッドシート接続設定 ====================
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 service_account_info = json.loads(st.secrets["gcp_service_account_json"])
-credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=scope)
-gc = gspread.authorize(credentials)
+credentials = {
+    "usernames": {
+        "student1": {
+            "name": "student1",
+            "password": stauth.Hasher(["1234"]).generate()[0]
+        },
+        "student2": {
+            "name": "student2",
+            "password": stauth.Hasher(["1234"]).generate()[0]
+        },
+        "student3": {
+            "name": "student3",
+            "password": stauth.Hasher(["1234"]).generate()[0]
+        }
+    }
+}
+
+authenticator = stauth.Authenticate(
+    credentials,
+    "eiken_quiz_app",
+    "abcdef",
+    cookie_expiry_days=1
+)
+
+name, authentication_status, username = authenticator.login("ログイン", "main")
 
 SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit#gid=0"
 spreadsheet = gc.open_by_url(SPREADSHEET_URL)
