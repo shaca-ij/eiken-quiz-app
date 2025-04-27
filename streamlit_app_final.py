@@ -9,7 +9,7 @@ import streamlit_authenticator as stauth
 # ==================== 認証設定 ====================
 st.set_page_config(page_title="英検クイズ", page_icon="📝")
 
-# 新しい認証方式に対応
+# 認証用設定
 credentials = {
     "usernames": {
         "student1": {
@@ -29,8 +29,8 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "eiken_quiz_app",
-    "abcdef",
+    "eiken_quiz_app",  # cookie名
+    "abcdef",          # 秘密キー
     cookie_expiry_days=1
 )
 
