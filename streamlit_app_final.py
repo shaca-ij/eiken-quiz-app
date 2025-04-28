@@ -38,15 +38,16 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-authenticator.login(location="main")
+auth_status = getattr(authenticator, "authentication_status", None)
 
-if authenticator.authentication_status:
-    st.success(f"ようこそ {authenticator.username} さん！")
-    # クイズ画面をここから作る
-elif authenticator.authentication_status is False:
-    st.error("ユーザー名かパスワードが違います。")
-elif authenticator.authentication_status is None:
+if auth_status is None:
     st.warning("ユーザー名とパスワードを入力してください。")
+elif auth_status == False:
+    st.error("ユーザー名かパスワードが違います。")
+elif auth_status == True:
+    st.success(f"ようこそ {authenticator.username} さん！")
+    # → クイズ画面をここに
+
 
 
 # Googleスプレッドシート接続
