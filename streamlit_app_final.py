@@ -38,7 +38,10 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-authentication_status, username = authenticator.login(location="main")
+authenticator.login(location="main")
+authentication_status = authenticator.authentication_status
+username = authenticator.username
+
 
 if not authentication_status:
     st.error("ユーザー名またはパスワードが違います")
