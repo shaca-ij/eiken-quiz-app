@@ -9,19 +9,24 @@ import streamlit_authenticator as stauth
 # 認証設定
 st.set_page_config(page_title="英検クイズ", page_icon="📝")
 
+# パスワードリストをハッシュ化
+passwords = ["1234", "1234", "1234"]
+hashed_passwords = stauth.Hasher(passwords).generate()
+
+# ログイン用のcredentialsを定義
 credentials = {
     "usernames": {
         "student1": {
             "name": "student1",
-            "password": stauth.Hasher(["1234"]).generate()[0]
+            "password": hashed_passwords[0]
         },
         "student2": {
             "name": "student2",
-            "password": stauth.Hasher(["1234"]).generate()[0]
+            "password": hashed_passwords[1]
         },
         "student3": {
             "name": "student3",
-            "password": stauth.Hasher(["1234"]).generate()[0]
+            "password": hashed_passwords[2]
         }
     }
 }
