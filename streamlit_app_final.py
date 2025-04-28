@@ -1,105 +1,66 @@
 import streamlit as st
 import pandas as pd
 import random
-import gspread
-from google.oauth2 import service_account
-import json
-import streamlit_authenticator as stauth
 
-# 認証設定
-st.set_page_config(page_title="英検クイズ", page_icon="📝")
+# CSVファイルを読み込み
+questions_df = pd.read_csv("words.csv")
 
+# セッション初期化
+if "current_q_idx" not in st.session_state:
+    st.session_state.current_q_idx = 0
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "answered" not in st.session_state:
+    st.session_state.answered = False
+if "selected_answer" not in st.session_state:
+    st.session_state.selected_answer = ""
 
-# 事前にハッシュ化されたパスワードを手動で用意する
-# （このハッシュはパスワード「1234」をハッシュしたものです）
+# 問題シャッフル
+quiz_questions = questions_df.sample(frac=1).reset_index(drop=True)
 
-credentials = {
-    "usernames": {
-        "student1": {
-            "name": "student1",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
-        },
-        "student2": {
-            "name": "student2",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
-        },
-        "student3": {
-            "name": "student3",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
-        }
-    }
-}
+# 現在の問題
+if st.session_state.current_q_idx < len(quiz_questions):
+    current_q = quiz_questions.iloc[st.session_state.current_q_idx]
+    question_text = current_q["sentence_with_blank"]
+    choices = current_q["choices"].split("|")
+    correct_answer = current_q["answer"]
+    meaning_jp = current_q["meaning_jp"]
+    sentence_jp = current_q["sentence_jp"]
 
+    st.markdown(f"### 問題 {st.session_state.current_q_idx + 1}")
+    st.write(question_text)
 
-authenticator = stauth.Authenticate(
-    credentials,
-    "eiken_quiz_app",  # cookie名
-    "abcdef",          # cookieのシークレット
-    cookie_expiry_days=1
-)
+    # フォームで選択肢と回答ボタン
+    with st.form(key="quiz_form"):
+        selected_choice = st.radio("選択肢を選んでください", choices)
+        submitted = st.form_submit_button("回答する")
 
-auth_status = getattr(authenticator, "authentication_status", None)
+        if submitted:
+            st.session_state.selected_answer = selected_choice
+            st.session_state.answered = True
 
-if auth_status is None:
-    st.warning("ユーザー名とパスワードを入力してください。")
-elif auth_status == False:
-    st.error("ユーザー名かパスワードが違います。")
-elif auth_status == True:
-    st.success(f"ようこそ {authenticator.username} さん！")
-    # → クイズ画面をここに
+    # 回答後の処理
+    if st.session_state.answered:
+        if st.session_state.selected_answer == correct_answer:
+            st.success(f"✅ 正解！ {correct_answer}")
+            st.session_state.score += 1
+        else:
+            st.error(f"❌ 不正解！ 正解は {correct_answer}")
 
+        st.info(f"【意味】{meaning_jp}")
+        st.info(f"【和訳】{sentence_jp}")
 
+        if st.button("▶ 次の問題へ"):
+            st.session_state.current_q_idx += 1
+            st.session_state.answered = False
+            st.session_state.selected_answer = ""
 
-# Googleスプレッドシート接続
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-service_account_info = json.loads(st.secrets["gcp_service_account_json"])
-credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=scope)
-gc = gspread.authorize(credentials)
-
-SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit#gid=0"
-spreadsheet = gc.open_by_url(SPREADSHEET_URL)
-worksheet = spreadsheet.worksheet("履歴")
-
-# データ読み込み
-df = pd.read_csv("words.csv")
-
-# モード選択
-mode = st.radio("モードを選択してください", ("通常モード", "復習モード"))
-
-if mode == "復習モード":
-    threshold = st.selectbox("正答率のしきい値を選んでください", (25, 50, 75))
-    history = pd.DataFrame(worksheet.get_all_records())
-    user_history = history[history["user"] == username]
-    if not user_history.empty:
-        correct_rate = user_history.groupby("word")["correct"].mean() * 100
-        low_accuracy_words = correct_rate[correct_rate < threshold].index.tolist()
-        quiz_base = df[df["word"].isin(low_accuracy_words)]
-        if quiz_base.empty:
-            st.warning("指定条件に該当する復習単語がありません。")
-            st.stop()
-    else:
-        st.warning("履歴が存在しません。通常モードで学習してください。")
-        st.stop()
 else:
-    quiz_base = df
-
-# 出題
-max_questions = len(quiz_base)
-quiz_size = st.slider("出題数を選んでください", 1, max_questions, min(5, max_questions), key="quiz_size_slider")
-
-if "quiz" not in st.session_state:
-    st.session_state.quiz = []
-    st.session_state.answers = {}
-    st.session_state.score = 0
-    st.session_state.finished = False
-
-if st.button("▶ クイズを始める"):
-    selected = quiz_base.sample(quiz_size).to_dict(orient="records")
-    for q in selected:
-        q["shuffled_choices"] = random.sample(q["choices"].split("|"), 4)
-    st.session_state.quiz = selected
-    st.session_state.answers = {}
-    st.session_state.score = 0
-    st.session_state.finished = False
-
-
+    # 全問終了
+    st.balloons()
+    st.success(f"🎉 全問終了！スコア：{st.session_state.score} / {len(quiz_questions)}")
+    if st.button("🔄 もう一度挑戦"):
+        st.session_state.current_q_idx = 0
+        st.session_state.score = 0
+        st.session_state.answered = False
+        st.session_state.selected_answer = ""
