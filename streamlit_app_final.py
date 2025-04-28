@@ -39,16 +39,14 @@ authenticator = stauth.Authenticate(
 )
 
 authenticator.login(location="main")
-authentication_status = authenticator.authentication_status
-username = authenticator.username
 
-
-if not authentication_status:
-    st.error("ユーザー名またはパスワードが違います")
-    st.stop()
-if authentication_status is None:
-    st.warning("ユーザー名とパスワードを入力してください")
-    st.stop()
+if authenticator.authentication_status:
+    st.success(f"ようこそ {authenticator.username} さん！")
+    # クイズ画面をここから作る
+elif authenticator.authentication_status is False:
+    st.error("ユーザー名かパスワードが違います。")
+elif authenticator.authentication_status is None:
+    st.warning("ユーザー名とパスワードを入力してください。")
 
 
 # Googleスプレッドシート接続
