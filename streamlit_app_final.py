@@ -6,10 +6,9 @@ from google.oauth2 import service_account
 import json
 import streamlit_authenticator as stauth
 
-# ==================== 認証設定 ====================
+# 認証設定
 st.set_page_config(page_title="英検クイズ", page_icon="📝")
 
-# 認証用設定
 credentials = {
     "usernames": {
         "student1": {
@@ -29,8 +28,8 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "eiken_quiz_app",  # cookie名
-    "abcdef",          # 秘密キー
+    "eiken_quiz_app",
+    "abcdef",
     cookie_expiry_days=1
 )
 
@@ -43,7 +42,7 @@ if authentication_status is None:
     st.warning("ユーザー名とパスワードを入力してください")
     st.stop()
 
-# ==================== スプレッドシート接続設定 ====================
+# Googleスプレッドシート接続
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 service_account_info = json.loads(st.secrets["gcp_service_account_json"])
 credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=scope)
@@ -53,10 +52,10 @@ SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPI
 spreadsheet = gc.open_by_url(SPREADSHEET_URL)
 worksheet = spreadsheet.worksheet("履歴")
 
-# ==================== データ読み込み ====================
+# データ読み込み
 df = pd.read_csv("words.csv")
 
-# ==================== モード選択 ====================
+# モード選択
 mode = st.radio("モードを選択してください", ("通常モード", "復習モード"))
 
 if mode == "復習モード":
@@ -76,7 +75,7 @@ if mode == "復習モード":
 else:
     quiz_base = df
 
-# ==================== 出題 ====================
+# 出題
 max_questions = len(quiz_base)
 quiz_size = st.slider("出題数を選んでください", 1, max_questions, min(5, max_questions), key="quiz_size_slider")
 
@@ -95,23 +94,4 @@ if st.button("▶ クイズを始める"):
     st.session_state.score = 0
     st.session_state.finished = False
 
-if st.session_state.quiz and not st.session_state.finished:
-    for idx, q in enumerate(st.session_state.quiz):
-        st.subheader(f"Q{idx+1}: {q['sentence_with_blank']}")
-        st.session_state.answers[idx] = st.radio(
-            "選択肢", q["shuffled_choices"], key=f"choice_{idx}"
-        )
 
-    if st.button("✅ 解答を提出"):
-        score = 0
-        for idx, q in enumerate(st.session_state.quiz):
-            user_answer = st.session_state.answers.get(idx)
-            correct = user_answer == q["answer"]
-            if correct:
-                score += 1
-            worksheet.append_row([username, q["word"], int(correct)])
-        st.session_state.score = score
-        st.session_state.finished = True
-
-if st.session_state.finished:
-    st.success(f"スコア: {st.session_state.score}/{len(st.session_state.quiz)}")
