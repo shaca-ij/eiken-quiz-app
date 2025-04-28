@@ -86,14 +86,16 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 選択肢をボタンで表示
-selected = None
-for choice in choices:
-    if st.button(choice, key=choice, use_container_width=True):
-        st.session_state.selected_answer = choice
-        st.session_state.answered = True
+# --- ここを改良する！ ---
 
-# 回答判定
+# 選択肢をボタンで表示
+if not st.session_state.answered:
+    for choice in choices:
+        if st.button(choice, key=choice, use_container_width=True):
+            st.session_state.selected_answer = choice
+            st.session_state.answered = True
+
+# 回答した後だけ判定・表示
 if st.session_state.answered:
     if st.session_state.selected_answer == correct_answer:
         st.session_state.score += 1
@@ -108,6 +110,7 @@ if st.session_state.answered:
         st.session_state.current_q_idx += 1
         st.session_state.answered = False
         st.session_state.selected_answer = ""
+
 
 # 全問終わったら結果表示
 if st.session_state.current_q_idx >= len(quiz_questions):
