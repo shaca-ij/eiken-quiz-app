@@ -17,16 +17,9 @@ credentials = {
     "usernames": {
         "student1": {
             "name": "student1",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
+            "password": "ハッシュ済みパスワード"  ← これだけでOK
         },
-        "student2": {
-            "name": "student2",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
-        },
-        "student3": {
-            "name": "student3",
-            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
-        }
+        ...
     }
 }
 
