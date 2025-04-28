@@ -17,7 +17,7 @@ credentials = {
     "usernames": {
         "student1": {
             "name": "student1",
-            "password": "ハッシュ済みパスワード"  ← これだけでOK
+            "password": "ハッシュ済みパスワード"
         },
         ...
     }
