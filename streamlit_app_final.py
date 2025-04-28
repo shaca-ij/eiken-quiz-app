@@ -28,8 +28,8 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "eiken_quiz_app",
-    "abcdef",
+    "eiken_quiz_app",  # cookie名
+    "abcdef",          # cookieのシークレット
     cookie_expiry_days=1
 )
 
@@ -41,6 +41,7 @@ if not authentication_status:
 if authentication_status is None:
     st.warning("ユーザー名とパスワードを入力してください")
     st.stop()
+
 
 # Googleスプレッドシート接続
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
