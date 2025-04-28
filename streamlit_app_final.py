@@ -13,20 +13,22 @@ st.set_page_config(page_title="英検クイズ", page_icon="📝")
 passwords = ["1234", "1234", "1234"]
 hashed_passwords = stauth.Hasher(passwords).generate()
 
-# ログイン用のcredentialsを定義
+# 事前にハッシュ化されたパスワードを手動で用意する
+# （このハッシュはパスワード「1234」をハッシュしたものです）
+
 credentials = {
     "usernames": {
         "student1": {
             "name": "student1",
-            "password": hashed_passwords[0]
+            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
         },
         "student2": {
             "name": "student2",
-            "password": hashed_passwords[1]
+            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
         },
         "student3": {
             "name": "student3",
-            "password": hashed_passwords[2]
+            "password": "$2b$12$0e7eGBlZnpYPgDklHxxh8.qP6Y79UQk3.CI/WTmf9x3BvutHRVKjO"  # 1234
         }
     }
 }
