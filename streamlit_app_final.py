@@ -9,9 +9,6 @@ import streamlit_authenticator as stauth
 # 認証設定
 st.set_page_config(page_title="英検クイズ", page_icon="📝")
 
-# パスワードリストをハッシュ化
-passwords = ["1234", "1234", "1234"]
-hashed_passwords = stauth.Hasher(passwords).generate()
 
 # 事前にハッシュ化されたパスワードを手動で用意する
 # （このハッシュはパスワード「1234」をハッシュしたものです）
