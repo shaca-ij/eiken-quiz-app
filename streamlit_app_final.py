@@ -51,9 +51,8 @@ if not st.session_state.answered:
         st.session_state.selected_answer = selected
         st.session_state.answered = True
         st.experimental_rerun()
-        st.stop()  # 🔥リロード後は必ずストップ
+        st.stop()  # 🔥リロード後、強制停止！
 
-# --- 解答後の画面 ---
 if st.session_state.answered:
     if st.session_state.selected_answer == correct_answer:
         st.success(f"✅ 正解！ {correct_answer}")
@@ -64,10 +63,9 @@ if st.session_state.answered:
     st.info(f"【意味】{meaning_jp}")
     st.info(f"【和訳】{sentence_jp}")
 
-    # 次の問題へ
     if st.button("▶ 次の問題へ"):
         st.session_state.current_q_idx += 1
         st.session_state.answered = False
         st.session_state.selected_answer = ""
         st.experimental_rerun()
-        st.stop()  # 🔥リロード後は必ずストップ
+        st.stop()  # 🔥リロード後、強制停止！
