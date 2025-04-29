@@ -79,8 +79,11 @@ if st.session_state.quiz_started:
     if st.session_state.show_result:
         if st.button("次の問題へ"):
             if st.session_state.current_q_idx + 1 < len(st.session_state.quiz):
+                # インデックスをインクリメント
                 st.session_state.current_q_idx += 1
                 st.session_state.show_result = False
                 st.session_state.user_answer = None
             else:
                 st.success("すべての問題が終了しました！")
+                st.session_state.quiz_started = False  # クイズ終了後にリセット
+
