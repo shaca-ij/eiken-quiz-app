@@ -20,7 +20,8 @@ if "answered" not in st.session_state:
 if "selected_answer" not in st.session_state:
     st.session_state.selected_answer = ""
 if "choices_shuffled" not in st.session_state:
-    st.session_state.choices_shuffled = {}
+    st.session_state.choices_shuffled = {}  # 🔥ここが超重要！！！
+
 
 # --- 問題選択 ---
 questions = df.to_dict(orient="records")
