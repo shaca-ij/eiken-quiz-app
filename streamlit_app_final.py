@@ -82,10 +82,18 @@ if st.button("✅ 解答する"):
         is_correct = st.session_state.user_answer == correct_answer
         st.session_state.show_result = True
 
-        if is_correct:
-            st.success("正解！ 🎉")
-        else:
-            st.error(f"不正解... 正解は **{correct_answer}**")
+        # 結果の表示
+if is_correct:
+    st.markdown(
+        "<div style='color: green; font-weight: bold; font-size: 22px;'>✅ 正解！ よくできました 🎉</div>",
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        f"<div style='color: red; font-weight: bold; font-size: 22px;'>✖ 不正解... 正解は <span style='color: black;'>{correct_answer}</span></div>",
+        unsafe_allow_html=True
+    )
+
 
         # 意味と和訳の表示（改行処理含む）
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
