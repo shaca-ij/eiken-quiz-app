@@ -2,23 +2,20 @@ import streamlit as st
 import pandas as pd
 import random
 
-# CSVファイルを読み込み、\n や choices の整形を行う
+# CSV読み込みと整形
 @st.cache_data
 def load_data():
     df = pd.read_csv("words.csv")
 
-    # 改行の整形（\n を実際の改行に変換）
+    # 改行コードと選択肢整形
     df["sentence_with_blank"] = df["sentence_with_blank"].astype(str).str.replace("\\n", "\n")
     df["sentence_jp"] = df["sentence_jp"].astype(str).str.replace("\\n", "\n")
-
-    # 選択肢の整形：空白除去と区切り統一
     df["choices"] = df["choices"].apply(lambda x: "|".join([c.strip() for c in str(x).split("|")]))
-
     return df
 
 df = load_data()
 
-# セッション状態の初期化
+# 初期化
 if "quiz" not in st.session_state:
     st.session_state.quiz = df.sample(frac=1).to_dict(orient="records")
     st.session_state.current_q_idx = 0
@@ -27,11 +24,33 @@ if "quiz" not in st.session_state:
 
 st.title("📝 英単語クイズ")
 
-# 現在の問題を取得
+# カスタムCSS：選択肢の文字サイズ、問題ボックスのスタイル
+st.markdown("""
+    <style>
+    div[role="radiogroup"] > label {
+        font-size: 20px !important;
+        padding: 8px 0;
+    }
+    .question-box {
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 進捗バー表示
+progress = (st.session_state.current_q_idx + 1) / len(st.session_state.quiz)
+st.progress(progress, text=f"{st.session_state.current_q_idx + 1} / {len(st.session_state.quiz)} 問")
+
+# 現在の問題
 current_q = st.session_state.quiz[st.session_state.current_q_idx]
 choices = current_q["choices"].split("|")
 
-# 選択肢のシャッフル（初回のみ）
+# 選択肢シャッフル
 if "choices_shuffled" not in st.session_state:
     st.session_state.choices_shuffled = {}
 
@@ -40,22 +59,20 @@ if st.session_state.current_q_idx not in st.session_state.choices_shuffled:
 
 shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_idx]
 
-# Q番号と問題文を別表示＆装飾
+# 問題表示
 question_number = f"Q{st.session_state.current_q_idx + 1}:"
 question_text = current_q["sentence_with_blank"].replace("\n", "<br>")
 
-# 問題番号の表示
 st.markdown(f"<p style='font-size: 26px; font-weight: bold; color: #2c3e50;'>{question_number}</p>", unsafe_allow_html=True)
-# 問題文の表示
-st.markdown(f"<p style='font-size: 22px; margin-top: 0.5em;'>{question_text}</p>", unsafe_allow_html=True)
+st.markdown(f"<div class='question-box'>{question_text}</div>", unsafe_allow_html=True)
 
-# ラジオボタンで選択肢表示（縦に並べる）
+# 選択肢の表示（縦並び＆大きめフォント）
 st.session_state.user_answer = st.radio(
     "選択肢：",
     shuffled_choices,
     index=None if st.session_state.user_answer is None else shuffled_choices.index(st.session_state.user_answer),
     key=f"answer_{st.session_state.current_q_idx}",
-    horizontal=False  # ← 縦並びにする
+    horizontal=False
 )
 
 # 「解答する」ボタン
