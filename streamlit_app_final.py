@@ -22,9 +22,10 @@ if "selected_answer" not in st.session_state:
 if "choices_shuffled" not in st.session_state:
     st.session_state.choices_shuffled = {}
 
-# --- 問題を選択 ---
+# --- 問題選択 ---
 questions = df.to_dict(orient="records")
 
+# --- クイズ終了処理 ---
 if st.session_state.current_q_idx >= len(questions):
     st.success(f"クイズ終了！スコア: {st.session_state.score} / {len(questions)}")
     if st.button("▶ 最初からやり直す"):
@@ -36,6 +37,7 @@ if st.session_state.current_q_idx >= len(questions):
         st.experimental_rerun()
         st.stop()
 
+# --- 現在の問題 ---
 current_q = questions[st.session_state.current_q_idx]
 sentence_with_blank = current_q["sentence_with_blank"]
 correct_answer = current_q["answer"]
@@ -46,24 +48,33 @@ sentence_jp = current_q["sentence_jp"]
 st.header(f"Q{st.session_state.current_q_idx + 1}")
 st.write(sentence_with_blank)
 
-# --- 選択肢シャッフル（1回だけ） ---
+# --- 選択肢シャッフル（1回だけ保存） ---
 if st.session_state.current_q_idx not in st.session_state.choices_shuffled:
     st.session_state.choices_shuffled[st.session_state.current_q_idx] = random.sample(choices, len(choices))
 
 shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_idx]
 
-# --- ラジオボタンで選択肢表示 ---
-selected = st.radio("選択肢を選んでください", shuffled_choices, key=f"q{st.session_state.current_q_idx}")
+# --- ラジオボタン（最初は選択なし） ---
+selected = st.radio(
+    "選択肢を選んでください",
+    shuffled_choices,
+    key=f"q{st.session_state.current_q_idx}",
+    index=None  # 🔥 最初は未選択！！
+)
 
-# --- 解答ボタン ---
+# --- 解答ボタン表示 ---
 if not st.session_state.answered:
     if st.button("✅ 解答する"):
-        st.session_state.selected_answer = selected
-        st.session_state.answered = True
-        st.experimental_rerun()
-        st.stop()
+        if selected:  # 🔥 選択していなかったら無視
+            st.session_state.selected_answer = selected
+            st.session_state.answered = True
+            st.experimental_rerun()
+            st.stop()
+        else:
+            st.warning("⚠️ 選択肢を選んでから解答してください！")
+            st.stop()
 
-# --- 正誤判定 ---
+# --- 正誤判定と解説 ---
 if st.session_state.answered:
     if st.session_state.selected_answer == correct_answer:
         st.success(f"✅ 正解！ {correct_answer}")
