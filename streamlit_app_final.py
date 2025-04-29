@@ -41,11 +41,19 @@ shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_
 # 問題番号の表示
 st.markdown(f"<div style='font-size: 22px; font-weight: bold;'>Q{st.session_state.current_q_idx + 1}:</div>", unsafe_allow_html=True)
 
-# 問題文の表示（改行処理付き）
+# 問題文の表示（背景色付き + 改行対応）
 sentence = str(current_q["sentence_with_blank"]).replace("\\n", "<br>").replace("\n", "<br>")
-st.markdown(f"<div style='font-size: 20px; padding-bottom: 10px;'>{sentence}</div>", unsafe_allow_html=True)
+st.markdown(f"""
+    <div style='
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 20px;
+        margin-bottom: 10px;
+    '>{sentence}</div>
+""", unsafe_allow_html=True)
 
-# ラジオボタンで選択肢表示（大きめのフォントと背景色）
+# ラジオボタンで選択肢表示（フォントサイズのみ調整）
 choice = st.radio(
     "選択肢：",
     shuffled_choices,
@@ -105,17 +113,14 @@ if st.button("🔁 間違えた問題を復習"):
     else:
         st.warning("間違えた問題がありません！")
 
-# CSSスタイル調整
+# 選択肢のスタイル（背景色は削除）
 st.markdown("""
     <style>
     div[role="radiogroup"] > label {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 10px;
-        margin: 5px 0;
         font-size: 18px;
         font-weight: 500;
         display: block;
+        margin: 4px 0;
     }
     </style>
 """, unsafe_allow_html=True)
