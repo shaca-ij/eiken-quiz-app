@@ -13,45 +13,39 @@
 12,vote,vote,vote|pack|save|arrange,"Each year, students at Bradley High School ________ for a student president. \nThis year, they chose a girl named Sally Burton.",投票する,毎年、
 13,deal,deal,deal|track|wish|sink,"Jason paid $700 for his new computer. 
 \nThe same computer was $900 in another store, so Jason thought he had gotten a good ________ .",取引,ジェイソンは
-,,,traded|stepped|explained|waved,"At the soccer game, many fans from Japan ( ) Japanese ﬂags in the
-air. There was red and white everywhere in the stadium.",,
-,,,valuable|innocent|private|familiar,"The necklace that was stolen from the jewelry store was very ( ). It
-was worth $70,000.",,
-,,,separately|forever|loudly|outdoors,"A : How long has Lisa been living in Germany?
+14,waved,waved,traded|stepped|explained|waved,"At the soccer game, many fans from Japan ( ) Japanese ﬂags in the air. There was red and white everywhere in the stadium.",,
+15,valuable,valuable,valuable|innocent|private|familiar,"The necklace that was stolen from the jewelry store was very ( ). It was worth $70,000.",,
+16,separately,separately,separately|forever|loudly|outdoors,"A : How long has Lisa been living in Germany?
 B : About 10 years, and she just bought a house there. I think she will stay there",,
-,,,humans 2 strangers 3 rulers 4 patients ,"Timmy is very friendly, and he sometimes talks to people sitting next to him
-on the train or bus. However, his mother told him to stop talking to ( ).",,
-,,,escalator 2 entrance 3 origin 4 operation,"A : Kim, what’s wrong with your leg?
-B : I broke it when I was skiing, so I had an ( ) at the hospital last
-week.",,
-,,,geography 2 chemistry 3 literature 4 economics,"A : What’s your favorite class this year, Ellie?
-B : I really like ( ). We’re learning the names of different countries and
-cities around the world.",,
-,,,lock 2 steal 3 pour 4 fail,"Charlotte volunteered at a marathon. Her job was to ( ) water into
-cups and hand the cups to the runners.",,
-,,,released 2 solved 3 considered 4 promoted,"Jennifer ( ) moving to a new apartment in the city. However, in the
+17,strangers,strangers,humans|strangers|rulers|patients ,"Timmy is very friendly, and he sometimes talks to people sitting next to him on the train or bus. However, his mother told him to stop talking to ( ).",,
+18,operation,operation,escalator|entrance|origin|operation,"A : Kim, what’s wrong with your leg?
+B : I broke it when I was skiing, so I had an ( ) at the hospital last week.",,
+19,geography,geography,geography|chemistry|literature|economics,"A : What’s your favorite class this year, Ellie?
+B : I really like ( ). We’re learning the names of different countries and cities around the world.",,
+20,pour,pour,lock | steal | pour | fail,Charlotte volunteered at a marathon. Her job was to ( ) water into cups and hand the cups to the runners.,,
+21,,,released | solved | considered | promoted,"Jennifer ( ) moving to a new apartment in the city. However, in the
 end, she decided to keep living in the same apartment.",,
-,,,open 2 keep 3 choose 4 send,"Pete asked Jan not to tell anyone in the ofﬁce that he was getting married, but she could not ( ) the news secret. She told one person, and soon everyone knew.",,
-,,,at once 2 if possible 3 no longer 4 with ease,"Brenda’s company just hired two new college graduates. Brenda is happy
+22,,,open | keep | choose | send,"Pete asked Jan not to tell anyone in the ofﬁce that he was getting married, but she could not ( ) the news secret. She told one person, and soon everyone knew.",,
+23,,,at once | if possible | no longer | with ease,"Brenda’s company just hired two new college graduates. Brenda is happy
 because she is ( ) the youngest employee in the company.",,
-,,,1 heavy 2 deep 3 cold 4 short,"Tony asked his sister to lend him $10 because he was ( ) of money.
+24,,,1 heavy | deep | cold | short,"Tony asked his sister to lend him $10 because he was ( ) of money.
 ",,
-,,,1 fell asleep 2 took turns 3 stood out 4 hung up,"When Diane got home after a long day at work, she tried to watch a movie.
+25,,,1 fell asleep | took turns | stood out | hung up,"When Diane got home after a long day at work, she tried to watch a movie.
 She was so tired that she ( ) in the middle of it.",,
-,,,1 over 2 in 3 below 4 between,"When David’s dog died suddenly, it took David a long time to get ( ) the shock. Finally, he began to feel better.",,
-,,,"1 under control 2 at times
-3 by now 4 in return","A : Derrick is late.
+26,,,1 over | in | below | between,"When David’s dog died suddenly, it took David a long time to get ( ) the shock. Finally, he began to feel better.",,
+27,,,"1 under control | at times
+3 by now | in return","A : Derrick is late.
 B : I know. He should have been here ( ). I’ll call him on his cell
 phone.",,
-,,,1 pleased with 2 full of 3 absent from 4 based on,"The box was ( ) cookies, so Carol took some. She hoped that her
+,,,1 pleased with | full of | absent from | based on,"The box was ( ) cookies, so Carol took some. She hoped that her
 mother would not notice that there were fewer cookies.
 ",,
-,,,1 will write 2 wrote 3 written 4 writing,"A : Brian, do you want to come to the gym with me tonight?
+,,,1 will write | wrote | written | writing,"A : Brian, do you want to come to the gym with me tonight?
 B : Sorry, but I can’t go. I’m busy ( ) my history report.
 ",,
-,,,1 others 2 other 3 the other 4 such others,"Some students liked to study in a group, while ( ) preferred to study
+,,,1 others | other | the other | such others,"Some students liked to study in a group, while ( ) preferred to study
 alone.
 ",,
-,,,1 drove 2 have driven 3 drive 4 to drive,"
+,,,1 drove | have driven | drive | to drive,"
 A : Thank you very much, Stuart. It was kind of you ( ) me home. B : No problem. I’ll stop the car in front of your apartment building.
 ",,
