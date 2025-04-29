@@ -1,94 +1,52 @@
 import streamlit as st
-import pandas as pd
 import random
+import pandas as pd
 
-# --- データ読み込み ---
-@st.cache_data
-def load_data():
-    df = pd.read_csv("words.csv")
-    return df
+# --- 読み込み ---
+df = pd.read_csv("words.csv")
 
-df = load_data()
-
-# --- セッション初期化 ---
-if "current_q_idx" not in st.session_state:
+# --- 最初だけシャッフルセット ---
+if "questions" not in st.session_state:
+    questions = df.to_dict(orient="records")
+    for q in questions:
+        q["choices_shuffled"] = random.sample(q["choices"].split("|"), len(q["choices"].split("|")))
+    random.shuffle(questions)
+    st.session_state.questions = questions
     st.session_state.current_q_idx = 0
-if "score" not in st.session_state:
-    st.session_state.score = 0
-if "answered" not in st.session_state:
-    st.session_state.answered = False
-if "selected_answer" not in st.session_state:
-    st.session_state.selected_answer = ""
-if "choices_shuffled" not in st.session_state:
-    st.session_state.choices_shuffled = {}  # 🔥ここが超重要！！！
+    st.session_state.correct_count = 0
 
+questions = st.session_state.questions
+current_idx = st.session_state.current_q_idx
+current_q = questions[current_idx]
 
-# --- 問題選択 ---
-questions = df.to_dict(orient="records")
+# --- UI表示 ---
+st.title("英検クイズアプリ")
+st.write(f"**Q{current_idx+1}: {current_q['sentence_with_blank']}**")
 
-# --- クイズ終了処理 ---
-if st.session_state.current_q_idx >= len(questions):
-    st.success(f"クイズ終了！スコア: {st.session_state.score} / {len(questions)}")
-    if st.button("▶ 最初からやり直す"):
-        st.session_state.current_q_idx = 0
-        st.session_state.score = 0
-        st.session_state.answered = False
-        st.session_state.selected_answer = ""
-        st.session_state.choices_shuffled = {}
-        st.experimental_rerun()
-        st.stop()
-
-# --- 現在の問題 ---
-current_q = questions[st.session_state.current_q_idx]
-sentence_with_blank = current_q["sentence_with_blank"]
-correct_answer = current_q["answer"]
-choices = current_q["choices"].split("|")
-meaning_jp = current_q["meaning_jp"]
-sentence_jp = current_q["sentence_jp"]
-
-st.header(f"Q{st.session_state.current_q_idx + 1}")
-st.write(sentence_with_blank)
-
-# --- 選択肢シャッフル（1回だけ保存） ---
-if st.session_state.current_q_idx not in st.session_state.choices_shuffled:
-    st.session_state.choices_shuffled[st.session_state.current_q_idx] = random.sample(choices, len(choices))
-
-shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_idx]
-
-# --- ラジオボタン（最初は選択なし） ---
-selected = st.radio(
-    "選択肢を選んでください",
-    shuffled_choices,
-    key=f"q{st.session_state.current_q_idx}",
-    index=None  # 🔥 最初は未選択！！
+# --- ラジオボタン ---
+user_answer = st.radio(
+    "選択肢から選んでください",
+    current_q["choices_shuffled"],
+    key=f"q_{current_idx}"
 )
 
-# --- 解答ボタン表示 ---
-if not st.session_state.answered:
-    if st.button("✅ 解答する"):
-        if selected:  # 🔥 選択していなかったら無視
-            st.session_state.selected_answer = selected
-            st.session_state.answered = True
-            st.experimental_rerun()
-            st.stop()
-        else:
-            st.warning("⚠️ 選択肢を選んでから解答してください！")
-            st.stop()
-
-# --- 正誤判定と解説 ---
-if st.session_state.answered:
-    if st.session_state.selected_answer == correct_answer:
-        st.success(f"✅ 正解！ {correct_answer}")
-        st.session_state.score += 1
+# --- ボタン ---
+if st.button("回答する"):
+    correct_answer = current_q["answer"]
+    if user_answer == correct_answer:
+        st.success("正解です！")
+        st.session_state.correct_count += 1
     else:
-        st.error(f"❌ 不正解！ 正解は {correct_answer}")
+        st.error(f"不正解！ 正解は {correct_answer} です")
+    st.info(f"意味: {current_q['meaning_jp']}")
+    st.info(f"和訳: {current_q['sentence_jp']}")
 
-    st.info(f"【意味】{meaning_jp}")
-    st.info(f"【和訳】{sentence_jp}")
+    # --- 次の問題へ進むボタンを表示 ---
+    if st.button("次の問題へ"):
+        if current_idx + 1 < len(questions):
+            st.session_state.current_q_idx += 1
+            st.experimental_rerun()
+        else:
+            st.balloons()
+            st.success(f"クイズ終了！正解数: {st.session_state.correct_count} / {len(questions)}")
 
-    if st.button("▶ 次の問題へ"):
-        st.session_state.current_q_idx += 1
-        st.session_state.answered = False
-        st.session_state.selected_answer = ""
-        st.experimental_rerun()
-        st.stop()
