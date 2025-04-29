@@ -38,7 +38,9 @@ shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_
 question_number = f"Q{st.session_state.current_q_idx + 1}:"
 question_text = current_q["sentence_with_blank"].replace("\n", "<br>")
 
+# 問題番号の表示
 st.markdown(f"<p style='font-size: 26px; font-weight: bold; color: #2c3e50;'>{question_number}</p>", unsafe_allow_html=True)
+# 問題文の表示
 st.markdown(f"<p style='font-size: 22px; margin-top: 0.5em;'>{question_text}</p>", unsafe_allow_html=True)
 
 # ラジオボタンで選択肢表示（縦に並べる）
@@ -47,7 +49,7 @@ st.session_state.user_answer = st.radio(
     shuffled_choices,
     index=None if st.session_state.user_answer is None else shuffled_choices.index(st.session_state.user_answer),
     key=f"answer_{st.session_state.current_q_idx}",
-    horizontal=False
+    horizontal=False  # ← これで縦並びになります
 )
 
 # 「解答する」ボタン
@@ -62,8 +64,10 @@ if st.button("✅ 解答する"):
         else:
             st.error(f"不正解... 正解は **{correct_answer}**")
 
+        # 意味と和訳も表示
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        st.markdown(f"**和訳：** {current_q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+        sentence_jp = str(current_q.get('sentence_jp', '')).replace("\n", "<br>")
+        st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
     else:
         st.warning("答えを選んでください。")
 
