@@ -30,7 +30,7 @@ if not st.session_state.quiz_started:
         st.session_state.user_answer = None
         st.session_state.show_result = False
         st.session_state.quiz = df.sample(frac=1).to_dict(orient="records")
-        st.experimental_rerun()
+        st.experimental_rerun()  # スタートボタンが押された後にリロード
 
 # もしクイズが開始されている場合
 if st.session_state.quiz_started:
@@ -83,6 +83,6 @@ if st.session_state.quiz_started:
                 st.session_state.current_q_idx += 1
                 st.session_state.show_result = False
                 st.session_state.user_answer = None
-                st.experimental_rerun()
+                st.experimental_rerun()  # 次の問題へ進む際にリロード
             else:
                 st.success("すべての問題が終了しました！")
