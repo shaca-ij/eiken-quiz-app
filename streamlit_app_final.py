@@ -6,6 +6,9 @@ import random
 questions_df = pd.read_csv("words.csv")
 
 # セッション初期化
+if "quiz_questions" not in st.session_state:
+    st.session_state.quiz_questions = questions_df.sample(frac=1).reset_index(drop=True)
+
 if "current_q_idx" not in st.session_state:
     st.session_state.current_q_idx = 0
 if "score" not in st.session_state:
@@ -14,6 +17,10 @@ if "answered" not in st.session_state:
     st.session_state.answered = False
 if "selected_answer" not in st.session_state:
     st.session_state.selected_answer = ""
+
+# ← 必ずこのリストを使う！
+quiz_questions = st.session_state.quiz_questions
+
 
 # 問題シャッフル
 quiz_questions = questions_df.sample(frac=1).reset_index(drop=True)
@@ -40,20 +47,24 @@ if st.session_state.current_q_idx < len(quiz_questions):
             st.session_state.answered = True
 
     # 回答後の処理
-    if st.session_state.answered:
-        if st.session_state.selected_answer == correct_answer:
-            st.success(f"✅ 正解！ {correct_answer}")
-            st.session_state.score += 1
-        else:
-            st.error(f"❌ 不正解！ 正解は {correct_answer}")
+if st.session_state.answered:
+    if st.session_state.selected_answer == correct_answer:
+        st.success(f"✅ 正解！ {correct_answer}")
+        st.session_state.score += 1
+    else:
+        st.error(f"❌ 不正解！ 正解は {correct_answer}")
 
-        st.info(f"【意味】{meaning_jp}")
-        st.info(f"【和訳】{sentence_jp}")
+    st.info(f"【意味】{meaning_jp}")
+    st.info(f"【和訳】{sentence_jp}")
 
-        if st.button("▶ 次の問題へ"):
-            st.session_state.current_q_idx += 1
-            st.session_state.answered = False
-            st.session_state.selected_answer = ""
+    next_button = st.button("▶ 次の問題へ")
+    if next_button:
+        st.session_state.current_q_idx += 1
+        st.session_state.answered = False
+        st.session_state.selected_answer = ""
+        st.experimental_rerun()  # ← 🔥これでページをリロード！！
+
+
 
 else:
     # 全問終了
