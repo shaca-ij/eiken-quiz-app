@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+import random
+
 # CSVファイルを読み込み、\n を本当の改行に変換
 @st.cache_data
 def load_data():
@@ -30,25 +34,20 @@ if st.session_state.current_q_idx not in st.session_state.choices_shuffled:
 
 shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_idx]
 
-# 問題文の表示
-problem_text = f"Q{st.session_state.current_q_idx + 1}: {current_q['sentence_with_blank']}"
+# Q番号と問題文を別表示＆装飾
+question_number = f"Q{st.session_state.current_q_idx + 1}:"
+question_text = current_q["sentence_with_blank"].replace("\n", "<br>")
 
-# 長い文章を改行したい場合は、適切な場所で <br> を追加
-problem_text = problem_text.replace("、", "、<br>")  # 例: 句読点の後で改行
+st.markdown(f"<p style='font-size: 26px; font-weight: bold; color: #2c3e50;'>{question_number}</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='font-size: 22px; margin-top: 0.5em;'>{question_text}</p>", unsafe_allow_html=True)
 
-# HTMLタグを使用して問題文のフォントサイズを調整
-problem_text = f"<div style='font-size: 22px'>{problem_text}</div>"
-
-# Markdownとして1回だけ表示
-st.markdown(problem_text, unsafe_allow_html=True)
-
-
-# ラジオボタンで選択肢表示
+# ラジオボタンで選択肢表示（縦に並べる）
 st.session_state.user_answer = st.radio(
     "選択肢：",
     shuffled_choices,
     index=None if st.session_state.user_answer is None else shuffled_choices.index(st.session_state.user_answer),
-    key=f"answer_{st.session_state.current_q_idx}"
+    key=f"answer_{st.session_state.current_q_idx}",
+    horizontal=False
 )
 
 # 「解答する」ボタン
@@ -64,7 +63,7 @@ if st.button("✅ 解答する"):
             st.error(f"不正解... 正解は **{correct_answer}**")
 
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        st.markdown(f"**和訳：** {current_q['sentence_jp']}")
+        st.markdown(f"**和訳：** {current_q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
     else:
         st.warning("答えを選んでください。")
 
