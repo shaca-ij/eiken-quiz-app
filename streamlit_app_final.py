@@ -32,6 +32,10 @@ user_answer = st.radio(
 
 # --- ボタン ---
 if st.button("回答する"):
+    if user_answer is None:
+        st.warning("選択肢を選んでからボタンを押してください！")
+        st.stop()
+
     correct_answer = current_q["answer"]
     if user_answer == correct_answer:
         st.success("正解です！")
