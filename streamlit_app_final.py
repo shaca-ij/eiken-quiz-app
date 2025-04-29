@@ -28,8 +28,8 @@ st.title("📝 英単語クイズ")
 st.markdown("""
     <style>
     div[role="radiogroup"] > label {
-        font-size: 20px !important;
-        padding: 8px 0;
+        font-size: 22px !important;
+        padding: 6px 0;
     }
     .question-box {
         background-color: #f5f5f5;
