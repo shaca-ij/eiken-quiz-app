@@ -4,7 +4,7 @@ import random
 
 # --- 設定 ---
 CSV_FILE = "words.csv"  # CSVファイル名
-SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit"  # スプレッドシートURL
+SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1IfqASoqhNwKFYoJdjkIPIXcO3mCE5j2Ng2PtmlWdj1c/edit"
 
 # --- セッション初期化 ---
 if "quiz_questions" not in st.session_state:
@@ -51,6 +51,7 @@ if not st.session_state.answered:
         st.session_state.selected_answer = selected
         st.session_state.answered = True
         st.experimental_rerun()
+        st.stop()  # 🔥リロード後は必ずストップ
 
 # --- 解答後の画面 ---
 if st.session_state.answered:
@@ -69,3 +70,4 @@ if st.session_state.answered:
         st.session_state.answered = False
         st.session_state.selected_answer = ""
         st.experimental_rerun()
+        st.stop()  # 🔥リロード後は必ずストップ
