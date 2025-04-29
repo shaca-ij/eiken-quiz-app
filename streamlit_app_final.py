@@ -11,25 +11,31 @@ def load_data():
 df = load_data()
 
 # セッション状態の初期化
-if "quiz" not in st.session_state:
-    st.session_state.quiz = df.sample(frac=1).to_dict(orient="records")
-    st.session_state.current_q_idx = 0
-    st.session_state.user_answer = None
-    st.session_state.show_result = False
-    st.session_state.incorrect_answers = []
+if "quiz_initialized" not in st.session_state:
+    # ユーザーが設定した出題数を記憶
+    st.session_state.quiz_length = 10
+    st.session_state.quiz_initialized = False
 
-# 進捗バーの表示
-total_questions = len(st.session_state.quiz)
-progress = (st.session_state.current_q_idx + 1) / total_questions
-st.progress(progress)
+if not st.session_state.quiz_initialized:
+    st.title("📝 英単語クイズ")
+    st.markdown("#### 出題数を選んでください")
+    quiz_length = st.slider("問題数", min_value=1, max_value=min(30, len(df)), value=10)
+    if st.button("スタート!"):
+        st.session_state.quiz = df.sample(frac=1).head(quiz_length).to_dict(orient="records")
+        st.session_state.current_q_idx = 0
+        st.session_state.user_answer = None
+        st.session_state.show_result = False
+        st.session_state.in_review_mode = False
+        st.session_state.incorrect_questions = []
+        st.session_state.quiz_length = quiz_length
+        st.session_state.quiz_initialized = True
+        st.experimental_rerun()
+    st.stop()
 
-st.title("📝 英単語クイズ")
-
-# 現在の問題を取得
-current_q = st.session_state.quiz[st.session_state.current_q_idx]
+quiz = st.session_state.quiz
+current_q = quiz[st.session_state.current_q_idx]
 choices = current_q["choices"].split("|")
 
-# 選択肢のシャッフル（初回のみ）
 if "choices_shuffled" not in st.session_state:
     st.session_state.choices_shuffled = {}
 
@@ -38,31 +44,43 @@ if st.session_state.current_q_idx not in st.session_state.choices_shuffled:
 
 shuffled_choices = st.session_state.choices_shuffled[st.session_state.current_q_idx]
 
-# 問題番号の表示
-st.markdown(f"<div style='font-size: 22px; font-weight: bold;'>Q{st.session_state.current_q_idx + 1}:</div>", unsafe_allow_html=True)
-
-# 問題文の表示（背景色付き + 改行対応）
-sentence = str(current_q["sentence_with_blank"]).replace("\\n", "<br>").replace("\n", "<br>")
-st.markdown(f"""
-    <div style='
-        background-color: #f5f5f5;
-        padding: 15px;
-        border-radius: 10px;
+# スタイル設定
+st.markdown("""
+    <style>
+    div.question-box {
+        background-color: #f0f9ff;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
         font-size: 20px;
-        margin-bottom: 10px;
-    '>{sentence}</div>
+        line-height: 1.6;
+    }
+    div[role="radiogroup"] > label {
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# ラジオボタンで選択肢表示（フォントサイズのみ調整）
-choice = st.radio(
+# 進捗バー
+progress = (st.session_state.current_q_idx + 1) / st.session_state.quiz_length
+st.progress(progress, text=f"進捗: {st.session_state.current_q_idx + 1} / {st.session_state.quiz_length}")
+
+# 問題番号と文
+st.markdown(f"### Q{st.session_state.current_q_idx + 1}:")
+st.markdown(f"<div class='question-box'>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
+
+# ラジオボタンで選択肢表示
+st.session_state.user_answer = st.radio(
     "選択肢：",
     shuffled_choices,
     index=None if st.session_state.user_answer is None else shuffled_choices.index(st.session_state.user_answer),
-    key=f"answer_{st.session_state.current_q_idx}",
-    label_visibility="collapsed"
+    key=f"answer_{st.session_state.current_q_idx}"
 )
-
-st.session_state.user_answer = choice
 
 # 「解答する」ボタン
 if st.button("✅ 解答する"):
@@ -72,55 +90,35 @@ if st.button("✅ 解答する"):
         st.session_state.show_result = True
 
         if is_correct:
-            st.markdown(
-                "<div style='color: green; font-weight: bold; font-size: 22px;'>✅ 正解！ よくできました 🎉</div>",
-                unsafe_allow_html=True
-            )
+            st.success("正解！ 🎉")
         else:
-            st.markdown(
-                f"<div style='color: red; font-weight: bold; font-size: 22px;'>✖ 不正解... 正解は <span style='color: black;'>{correct_answer}</span></div>",
-                unsafe_allow_html=True
-            )
-            st.session_state.incorrect_answers.append(current_q)
+            st.error(f"❌ 不正解... 正解は **{correct_answer}**")
+            st.session_state.incorrect_questions.append(current_q)
 
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        sentence_jp = str(current_q.get('sentence_jp', '')).replace("\n", "<br>")
-        st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
+        st.markdown(f"**和訳：** {current_q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
     else:
         st.warning("答えを選んでください。")
 
 # 「次の問題へ」ボタン
 if st.session_state.show_result:
     if st.button("次の問題へ"):
-        if st.session_state.current_q_idx + 1 < len(st.session_state.quiz):
+        if st.session_state.current_q_idx + 1 < len(quiz):
             st.session_state.current_q_idx += 1
             st.session_state.show_result = False
             st.session_state.user_answer = None
-            st.rerun()
+            st.experimental_rerun()
         else:
             st.success("すべての問題が終了しました！")
-
-# 復習モード：不正解だけ再出題
-if st.button("🔁 間違えた問題を復習"):
-    if st.session_state.incorrect_answers:
-        st.session_state.quiz = st.session_state.incorrect_answers
-        st.session_state.current_q_idx = 0
-        st.session_state.incorrect_answers = []
-        st.session_state.user_answer = None
-        st.session_state.show_result = False
-        st.session_state.choices_shuffled = {}
-        st.experimental_rerun()
-    else:
-        st.warning("間違えた問題がありません！")
-
-# 選択肢のスタイル（背景色は削除）
-st.markdown("""
-    <style>
-    div[role="radiogroup"] > label {
-        font-size: 18px;
-        font-weight: 500;
-        display: block;
-        margin: 4px 0;
-    }
-    </style>
-""", unsafe_allow_html=True)
+            if st.session_state.incorrect_questions:
+                if st.button("🔁 間違えた問題を復習する"):
+                    st.session_state.quiz = st.session_state.incorrect_questions
+                    st.session_state.quiz_length = len(st.session_state.incorrect_questions)
+                    st.session_state.current_q_idx = 0
+                    st.session_state.show_result = False
+                    st.session_state.user_answer = None
+                    st.session_state.incorrect_questions = []
+                    st.session_state.choices_shuffled = {}
+                    st.experimental_rerun()
+            else:
+                st.info("すべて正解でした！ 🎉")
