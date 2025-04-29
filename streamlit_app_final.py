@@ -2,12 +2,18 @@ import streamlit as st
 import pandas as pd
 import random
 
-# CSVファイルを読み込み、\n を本当の改行に変換
+# CSVファイルを読み込み、\n や choices の整形を行う
 @st.cache_data
 def load_data():
     df = pd.read_csv("words.csv")
-    df["sentence_with_blank"] = df["sentence_with_blank"].str.replace("\\n", "\n")
-    df["sentence_jp"] = df["sentence_jp"].str.replace("\\n", "\n")
+
+    # 改行の整形（\n を実際の改行に変換）
+    df["sentence_with_blank"] = df["sentence_with_blank"].astype(str).str.replace("\\n", "\n")
+    df["sentence_jp"] = df["sentence_jp"].astype(str).str.replace("\\n", "\n")
+
+    # 選択肢の整形：空白除去と区切り統一
+    df["choices"] = df["choices"].apply(lambda x: "|".join([c.strip() for c in str(x).split("|")]))
+
     return df
 
 df = load_data()
@@ -49,7 +55,7 @@ st.session_state.user_answer = st.radio(
     shuffled_choices,
     index=None if st.session_state.user_answer is None else shuffled_choices.index(st.session_state.user_answer),
     key=f"answer_{st.session_state.current_q_idx}",
-    horizontal=False  # ← これで縦並びになります
+    horizontal=False  # ← 縦並びにする
 )
 
 # 「解答する」ボタン
@@ -64,7 +70,7 @@ if st.button("✅ 解答する"):
         else:
             st.error(f"不正解... 正解は **{correct_answer}**")
 
-        # 意味と和訳も表示
+        # 意味と和訳の表示（改行処理含む）
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
         sentence_jp = str(current_q.get('sentence_jp', '')).replace("\n", "<br>")
         st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
