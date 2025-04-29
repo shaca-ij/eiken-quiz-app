@@ -47,10 +47,13 @@ if st.button("回答する"):
 
     # --- 次の問題へ進むボタンを表示 ---
     if st.button("次の問題へ"):
-        if current_idx + 1 < len(questions):
-            st.session_state.current_q_idx += 1
-            st.experimental_rerun()
-        else:
-            st.balloons()
-            st.success(f"クイズ終了！正解数: {st.session_state.correct_count} / {len(questions)}")
+    if st.session_state.current_q_idx + 1 < len(st.session_state.quiz):
+        st.session_state.current_q_idx += 1
+        st.session_state.show_result = False
+        st.session_state.user_answer = None
+        st.experimental_rerun()
+    else:
+        st.success("すべての問題が終了しました！")
+        # ここで結果集計・表示をするなど
+
 
