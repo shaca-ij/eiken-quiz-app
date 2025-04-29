@@ -1,11 +1,9 @@
-import streamlit as st
-import pandas as pd
-import random
-
-# CSVファイルを読み込み
+# CSVファイルを読み込み、\n を本当の改行に変換
 @st.cache_data
 def load_data():
     df = pd.read_csv("words.csv")
+    df["sentence_with_blank"] = df["sentence_with_blank"].str.replace("\\n", "\n")
+    df["sentence_jp"] = df["sentence_jp"].str.replace("\\n", "\n")
     return df
 
 df = load_data()
