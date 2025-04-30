@@ -49,7 +49,8 @@ elif st.session_state.page == "quiz":
     st.progress(progress_ratio)
 
     # 問題表示（背景に対応）
-    st.markdown(f"<div style='background-color:#ffffff10; padding:15px; border-radius:10px;'>"
+    bg_color = "#f0f0f0" if st.get_option("theme.base") == "light" else "#333333"
+    st.markdown(f"<div style='background-color:{bg_color}; padding:15px; border-radius:10px;'>"
                 f"<b>Q{current_idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}"
                 f"</div>", unsafe_allow_html=True)
 
@@ -111,6 +112,7 @@ elif st.session_state.page == "review":
         st.markdown("---")
         st.markdown("### ❌ 誤答回数ランキング")
         mistake_df = pd.DataFrame.from_dict(st.session_state.mistake_counts, orient='index', columns=['mistakes'])
+        mistake_df.index.name = 'word'
         mistake_df = mistake_df.sort_values(by='mistakes', ascending=False)
         st.dataframe(mistake_df)
 
