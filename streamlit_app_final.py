@@ -1,12 +1,30 @@
 import streamlit as st
 import pandas as pd
 import random
+import os
+from datetime import datetime
 
 st.set_page_config(page_title="英単語クイズ", layout="centered")
 
 @st.cache_data
 def load_data():
     return pd.read_csv("words.csv")
+
+def save_result(user, word, selected, correct, is_correct):
+    result_path = f"results_{user}.csv"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    row = pd.DataFrame([{
+        "timestamp": timestamp,
+        "user": user,
+        "word": word,
+        "selected": selected,
+        "correct": correct,
+        "is_correct": is_correct
+    }])
+    if os.path.exists(result_path):
+        row.to_csv(result_path, mode='a', header=False, index=False)
+    else:
+        row.to_csv(result_path, mode='w', header=True, index=False)
 
 # セッション状態初期化
 if "page" not in st.session_state:
@@ -19,14 +37,30 @@ if "user_answers" not in st.session_state:
     st.session_state.user_answers = []
 if "answered" not in st.session_state:
     st.session_state.answered = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
-# スタート画面
+# ユーザー名入力画面
 if st.session_state.page == "start":
     st.title("📝 英単語クイズ")
+    st.session_state.username = st.text_input("あなたの名前（ニックネームでも可）を入力してください：")
     num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
 
-    if st.button("スタート"):
+    if st.session_state.username and st.button("スタート"):
         df = load_data()
+
+        # 復習対象の単語を優先（正答率50%未満 or 過去に不正解）
+        result_path = f"results_{st.session_state.username}.csv"
+        if os.path.exists(result_path):
+            results_df = pd.read_csv(result_path)
+            stats = results_df.groupby("word").agg(
+                correct_count=("is_correct", "sum"),
+                total_count=("is_correct", "count")
+            )
+            stats["accuracy"] = stats["correct_count"] / stats["total_count"]
+            low_score_words = stats[stats["accuracy"] < 0.5].index.tolist()
+            df = df[df["answer"].isin(low_score_words + df["answer"].tolist())]
+
         quiz = df.sample(frac=1).head(num_questions).to_dict(orient="records")
         st.session_state.quiz = quiz
         st.session_state.current_q_idx = 0
@@ -41,10 +75,9 @@ elif st.session_state.page == "quiz":
     current_idx = st.session_state.current_q_idx
     current_q = quiz[current_idx]
 
-    # 進捗バー（上部）
-    st.progress((current_idx + 1) / len(quiz))
+    percent_complete = int((current_idx + 1) / len(quiz) * 100)
+    st.progress((current_idx + 1) / len(quiz), text=f"進捗: {percent_complete}%")
 
-    # 問題文（ダーク／ライト対応）
     st.markdown(f"""
         <div style='
             padding:15px; 
@@ -56,20 +89,21 @@ elif st.session_state.page == "quiz":
         </div>
         """, unsafe_allow_html=True)
 
-    # 選択肢の表示（シャッフル）
     choices = current_q["choices"].split("|")
-    random.seed(current_idx)  # 再現性のため
+    random.seed(current_idx)
     choices = random.sample(choices, len(choices))
 
     selected = st.radio("選択肢を選んでください：", choices, key=f"answer_{current_idx}")
 
-    # 解答ボタン（未回答時のみ表示）
     if not st.session_state.answered and st.button("✅ 解答する"):
         correct = current_q["answer"]
         st.session_state.user_answers.append({"selected": selected, "correct": correct})
         st.session_state.answered = True
 
-        if selected == correct:
+        is_correct = (selected == correct)
+        save_result(st.session_state.username, correct, selected, correct, is_correct)
+
+        if is_correct:
             st.success("正解！ 🎉")
         else:
             st.markdown(
@@ -77,7 +111,6 @@ elif st.session_state.page == "quiz":
                 unsafe_allow_html=True
             )
 
-        # 解説
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
         sentence_jp = current_q['sentence_jp']
         if pd.notna(sentence_jp):
@@ -86,7 +119,6 @@ elif st.session_state.page == "quiz":
         else:
             st.markdown("**和訳：** （和訳なし）")
 
-    # 次の問題へ（解答後のみ表示）
     if st.session_state.answered:
         if st.button("➡ 次の問題へ"):
             if current_idx + 1 < len(quiz):
@@ -104,7 +136,6 @@ elif st.session_state.page == "review":
     total = len(st.session_state.user_answers)
     st.markdown(f"### 正解数： {score} / {total}")
 
-    # 間違えた問題
     st.markdown("---")
     st.markdown("### ❗ 復習（間違えた問題）")
     for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
