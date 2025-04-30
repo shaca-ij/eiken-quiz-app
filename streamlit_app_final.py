@@ -18,6 +18,8 @@ if "current_q_idx" not in st.session_state:
     st.session_state.current_q_idx = 0
 if "user_answers" not in st.session_state:
     st.session_state.user_answers = []
+if "answered" not in st.session_state:
+    st.session_state.answered = False
 
 # スタート画面
 if st.session_state.page == "start":
@@ -30,6 +32,7 @@ if st.session_state.page == "start":
         st.session_state.quiz = quiz
         st.session_state.current_q_idx = 0
         st.session_state.user_answers = []
+        st.session_state.answered = False
         st.session_state.page = "quiz"
         st.rerun()
 
@@ -39,36 +42,48 @@ elif st.session_state.page == "quiz":
     current_idx = st.session_state.current_q_idx
     current_q = quiz[current_idx]
 
-    # 進捗バー
+    # 進捗バー（上部）
     st.progress((current_idx + 1) / len(quiz))
 
-    # 問題表示
-    st.markdown(f"<div style='background-color:#f0f8ff; padding:15px; border-radius:10px;'>"
-                f"<b>Q{current_idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}"
-                f"</div>", unsafe_allow_html=True)
+    # 問題表示（背景色付き）
+    st.markdown(f"""
+    <div style='background-color:#f0f8ff; padding:15px; border-radius:10px;'>
+        <b>Q{current_idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
+    </div>""", unsafe_allow_html=True)
 
-    # 選択肢の表示（大きく）
+    # 選択肢の表示（ランダムシャッフル）
     choices = current_q["choices"].split("|")
     random.seed(current_idx)
     choices = random.sample(choices, len(choices))
 
-    selected = st.radio(
-        "選択肢を選んでください：",
-        choices,
-        key=f"answer_{current_idx}"
-    )
+    selected = st.radio("選択肢を選んでください：", choices, key=f"answer_{current_idx}")
 
-    # 解答ボタン
-    if st.button("✅ 解答する"):
+    if not st.session_state.answered:
+        if st.button("✅ 解答する"):
+            correct = current_q["answer"]
+            st.session_state.user_answers.append({"selected": selected, "correct": correct})
+            st.session_state.answered = True
+
+            if selected == correct:
+                st.success("正解！ 🎉")
+            else:
+                st.markdown(f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>", unsafe_allow_html=True)
+
+            st.markdown(f"**意味：** {current_q['meaning_jp']}")
+            sentence_jp = current_q['sentence_jp']
+            if pd.notna(sentence_jp):
+                sentence_jp = sentence_jp.replace("\n", "<br>")
+                st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
+            else:
+                st.markdown("**和訳：** （和訳なし）")
+    else:
+        selected = st.session_state.user_answers[-1]["selected"]
         correct = current_q["answer"]
-        st.session_state.user_answers.append({"selected": selected, "correct": correct})
-
         if selected == correct:
             st.success("正解！ 🎉")
         else:
             st.markdown(f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>", unsafe_allow_html=True)
 
-        # 意味と和訳
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
         sentence_jp = current_q['sentence_jp']
         if pd.notna(sentence_jp):
@@ -77,13 +92,14 @@ elif st.session_state.page == "quiz":
         else:
             st.markdown("**和訳：** （和訳なし）")
 
-        # 次の問題へ
         if st.button("次の問題へ"):
             if current_idx + 1 < len(quiz):
                 st.session_state.current_q_idx += 1
+                st.session_state.answered = False
                 st.rerun()
             else:
                 st.session_state.page = "review"
+                st.session_state.answered = False
                 st.rerun()
 
 # 結果画面
@@ -93,7 +109,6 @@ elif st.session_state.page == "review":
     total = len(st.session_state.user_answers)
     st.markdown(f"### 正解数： {score} / {total}")
 
-    # 間違えた問題の復習
     st.markdown("---")
     st.markdown("### ❗ 復習（間違えた問題）")
     for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
@@ -110,4 +125,5 @@ elif st.session_state.page == "review":
         st.session_state.quiz = []
         st.session_state.user_answers = []
         st.session_state.current_q_idx = 0
+        st.session_state.answered = False
         st.rerun()
