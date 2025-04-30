@@ -11,7 +11,7 @@ def load_quiz_data():
     quiz_list = []
     for _, row in df.iterrows():
         quiz_list.append({
-            "sentence_with_blank": row["sentence_en"],
+            "sentence_with_blank": row["sentence_with_blank"],
             "choices": row["choices"].split("|"),
             "answer": row["answer"],
             "sentence_jp": row["sentence_jp"],
