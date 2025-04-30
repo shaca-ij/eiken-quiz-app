@@ -73,6 +73,8 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 if "selected_choice" not in st.session_state:
     st.session_state.selected_choice = None
+if "go_next" not in st.session_state:
+    st.session_state.go_next = False
 
 # スタートページ
 if st.session_state.page == "start":
@@ -155,13 +157,20 @@ elif st.session_state.page == "quiz":
                 st.markdown("**和訳：** （和訳なし）")
 
     if st.session_state.answered:
-        if st.button("➡ 次の問題へ"):
-            if current_idx + 1 < len(quiz):
-                st.session_state.current_q_idx += 1
-                st.session_state.answered = False
-                st.session_state.selected_choice = None
-            else:
-                st.session_state.page = "review"
+    if st.button("➡ 次の問題へ"):
+        st.session_state.go_next = True
+        st.rerun()
+
+# 再読み込み後の処理
+if st.session_state.go_next:
+    st.session_state.go_next = False
+    if current_idx + 1 < len(quiz):
+        st.session_state.current_q_idx += 1
+        st.session_state.answered = False
+    else:
+        st.session_state.page = "review"
+    st.rerun()
+
 
 # 結果ページ
 elif st.session_state.page == "review":
