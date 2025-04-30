@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import os
+import sqlite3
 from datetime import datetime
 
 st.set_page_config(page_title="英単語クイズ", layout="centered")
@@ -10,21 +11,50 @@ st.set_page_config(page_title="英単語クイズ", layout="centered")
 def load_data():
     return pd.read_csv("words.csv")
 
+def init_db():
+    conn = sqlite3.connect("quiz_results.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            timestamp TEXT,
+            word TEXT,
+            selected TEXT,
+            correct TEXT,
+            is_correct INTEGER
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
 def save_result(user, word, selected, correct, is_correct):
-    result_path = f"results_{user}.csv"
+    conn = sqlite3.connect("quiz_results.db")
+    cursor = conn.cursor()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    row = pd.DataFrame([{
-        "timestamp": timestamp,
-        "user": user,
-        "word": word,
-        "selected": selected,
-        "correct": correct,
-        "is_correct": is_correct
-    }])
-    if os.path.exists(result_path):
-        row.to_csv(result_path, mode='a', header=False, index=False)
-    else:
-        row.to_csv(result_path, mode='w', header=True, index=False)
+    cursor.execute('''
+        INSERT INTO results (username, timestamp, word, selected, correct, is_correct)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (user, timestamp, word, selected, correct, int(is_correct)))
+    conn.commit()
+    conn.close()
+
+def load_user_stats(username):
+    conn = sqlite3.connect("quiz_results.db")
+    query = '''
+        SELECT word, SUM(is_correct) AS correct_count, COUNT(*) AS total_count
+        FROM results
+        WHERE username = ?
+        GROUP BY word
+    '''
+    stats = pd.read_sql_query(query, conn, params=(username,))
+    conn.close()
+    if not stats.empty:
+        stats["accuracy"] = stats["correct_count"] / stats["total_count"]
+    return stats
+
+# データベース初期化
+init_db()
 
 # セッション状態初期化
 if "page" not in st.session_state:
@@ -43,22 +73,15 @@ if "username" not in st.session_state:
 # ユーザー名入力画面
 if st.session_state.page == "start":
     st.title("📝 英単語クイズ")
-    st.session_state.username = st.text_input("あなたの名前（ニックネームでも可）を入力してください：")
+    st.session_state.username = st.text_input("あなたの名前を入力してください：", value=st.session_state.username)
     num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
 
-    if st.session_state.username and st.button("スタート"):
+    if st.button("スタート") and st.session_state.username.strip():
         df = load_data()
 
-        # 復習対象の単語を優先（正答率50%未満 or 過去に不正解）
-        result_path = f"results_{st.session_state.username}.csv"
-        if os.path.exists(result_path):
-            results_df = pd.read_csv(result_path)
-            stats = results_df.groupby("word").agg(
-                correct_count=("is_correct", "sum"),
-                total_count=("is_correct", "count")
-            )
-            stats["accuracy"] = stats["correct_count"] / stats["total_count"]
-            low_score_words = stats[stats["accuracy"] < 0.5].index.tolist()
+        stats = load_user_stats(st.session_state.username)
+        if not stats.empty:
+            low_score_words = stats[stats["accuracy"] < 0.5]["word"].tolist()
             df = df[df["answer"].isin(low_score_words + df["answer"].tolist())]
 
         quiz = df.sample(frac=1).head(num_questions).to_dict(orient="records")
@@ -93,7 +116,8 @@ elif st.session_state.page == "quiz":
     random.seed(current_idx)
     choices = random.sample(choices, len(choices))
 
-    selected = st.radio("選択肢を選んでください：", choices, key=f"answer_{current_idx}")
+    selected = st.radio("選択肢を選んでください：", choices, key=f"answer_{current_idx}",
+                        format_func=lambda x: f"🔘 {x}")
 
     if not st.session_state.answered and st.button("✅ 解答する"):
         correct = current_q["answer"]
