@@ -154,6 +154,7 @@ elif st.session_state.page == "quiz":
                 st.markdown("**和訳：** （和訳なし）")
 
     if st.session_state.answered:
+        # 次の問題へ（全問終了後、review画面へ遷移）
         if st.button("➡ 次の問題へ"):
             st.session_state.selected_choice = None
             if current_idx + 1 < len(quiz):
@@ -161,5 +162,6 @@ elif st.session_state.page == "quiz":
                 st.session_state.answered = False
                 st.rerun()
             else:
-                st.session_state.page = "review"
+                st.session_state.page = "review"  # 全問解答後に復習画面に遷移
+                st.session_state.current_q_idx = 0  # 復習モードに必要な場合、初期化
                 st.rerun()
