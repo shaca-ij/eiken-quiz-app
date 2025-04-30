@@ -2,110 +2,112 @@ import streamlit as st
 import pandas as pd
 import random
 
-# CSVファイル読み込み関数
-def load_quiz_data():
-    df = pd.read_csv("words.csv")
-    quiz_data = []
-    for _, row in df.iterrows():
-        choices = row["choices"].split("|")
-        random.shuffle(choices)
-        quiz_data.append({
-            "word": row["word"],
-            "answer": row["answer"],
-            "choices": choices,
-            "sentence_with_blank": row["sentence_with_blank"],
-            "meaning_jp": row["meaning_jp"],
-            "sentence_jp": row["sentence_jp"]
-        })
-    return quiz_data
-
-# クイズ状態初期化関数
-def initialize_quiz(num_questions):
-    full_quiz = load_quiz_data()
-    random.shuffle(full_quiz)
-    st.session_state.quiz = full_quiz[:num_questions]
-    st.session_state.current_q_idx = 0
-    st.session_state.score = 0
-    st.session_state.show_answer = False
-    st.session_state.selected = None
-    st.session_state.page = "quiz"
-
-# 進捗バー表示
-def show_progress():
-    progress = (st.session_state.current_q_idx) / len(st.session_state.quiz)
-    st.progress(progress, text=f"{st.session_state.current_q_idx} / {len(st.session_state.quiz)}")
-
-# クイズ1問の表示
-def show_question():
-    q = st.session_state.quiz[st.session_state.current_q_idx]
-
-    show_progress()
-
-    st.markdown(f"### Q{st.session_state.current_q_idx + 1}:")
-    st.markdown(
-        f"""
-        <div style='background-color:#f0f2f6; padding: 12px; border-radius: 10px;'>
-            {q['sentence_with_blank']}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    col1, col2 = st.columns([1, 5])
-    for choice in q["choices"]:
-        c1, c2 = st.columns([1, 5])
-        with c1:
-            if st.session_state.show_answer is False:
-                if st.button("選ぶ", key=choice):
-                    st.session_state.selected = choice
-                    st.session_state.show_answer = True
-                    if choice == q["answer"]:
-                        st.session_state.score += 1
-        with c2:
-            st.markdown(f"**{choice}**")
-
-    if st.session_state.show_answer:
-        if st.session_state.selected == q["answer"]:
-            st.success("〇 正解！")
-        else:
-            st.error(
-                f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{q['answer']}</u></span>",
-                unsafe_allow_html=True
-            )
-        st.markdown(f"**意味：** {q['meaning_jp']}")
-        st.markdown(f"**和訳：** {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
-
-        if st.button("次の問題へ"):
-            st.session_state.current_q_idx += 1
-            st.session_state.show_answer = False
-            st.session_state.selected = None
-
-    # クイズ終了判定
-    if st.session_state.current_q_idx >= len(st.session_state.quiz):
-        st.session_state.page = "result"
-
-# 結果画面
-def show_result():
-    score = st.session_state.score
-    total = len(st.session_state.quiz)
-    st.markdown(f"# 結果: {score} / {total} 正解")
-    if st.button("もう一度挑戦"):
-        st.session_state.page = "start"
-
-# アプリ本体
 st.set_page_config(page_title="英単語クイズ", layout="centered")
-st.title("英検準2級 英単語クイズ")
 
+# データの読み込み
+@st.cache_data
+def load_data():
+    return pd.read_csv("words.csv")
+
+# セッション初期化
 if "page" not in st.session_state:
     st.session_state.page = "start"
+if "quiz" not in st.session_state:
+    st.session_state.quiz = []
+if "current_q_idx" not in st.session_state:
+    st.session_state.current_q_idx = 0
+if "user_answers" not in st.session_state:
+    st.session_state.user_answers = []
 
+# スタート画面
 if st.session_state.page == "start":
-    num = st.slider("出題数を選んでください", min_value=1, max_value=30, value=10)
+    st.title("📝 英単語クイズ")
+    num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
+
     if st.button("スタート"):
-        initialize_quiz(num)
+        df = load_data()
+        quiz = df.sample(frac=1).head(num_questions).to_dict(orient="records")
+        st.session_state.quiz = quiz
+        st.session_state.current_q_idx = 0
+        st.session_state.user_answers = []
+        st.session_state.page = "quiz"
+        st.rerun()
 
+# クイズ画面
 elif st.session_state.page == "quiz":
-    show_question()
+    quiz = st.session_state.quiz
+    current_idx = st.session_state.current_q_idx
+    current_q = quiz[current_idx]
 
-elif st.session_state.page == "result":
-    show_result()
+    # 進捗バー
+    st.progress((current_idx + 1) / len(quiz))
+
+    # 問題表示
+    st.markdown(f"<div style='background-color:#f0f8ff; padding:15px; border-radius:10px;'>"
+                f"<b>Q{current_idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}"
+                f"</div>", unsafe_allow_html=True)
+
+    # 選択肢の表示（大きく）
+    choices = current_q["choices"].split("|")
+    random.seed(current_idx)
+    choices = random.sample(choices, len(choices))
+
+    selected = st.radio(
+        "選択肢を選んでください：",
+        choices,
+        key=f"answer_{current_idx}"
+    )
+
+    # 解答ボタン
+    if st.button("✅ 解答する"):
+        correct = current_q["answer"]
+        st.session_state.user_answers.append({"selected": selected, "correct": correct})
+
+        if selected == correct:
+            st.success("正解！ 🎉")
+        else:
+            st.markdown(f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>", unsafe_allow_html=True)
+
+        # 意味と和訳
+        st.markdown(f"**意味：** {current_q['meaning_jp']}")
+        sentence_jp = current_q['sentence_jp']
+        if pd.notna(sentence_jp):
+            sentence_jp = sentence_jp.replace("\n", "<br>")
+            st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
+        else:
+            st.markdown("**和訳：** （和訳なし）")
+
+        # 次の問題へ
+        if st.button("次の問題へ"):
+            if current_idx + 1 < len(quiz):
+                st.session_state.current_q_idx += 1
+                st.rerun()
+            else:
+                st.session_state.page = "review"
+                st.rerun()
+
+# 結果画面
+elif st.session_state.page == "review":
+    st.title("📊 結果と復習")
+    score = sum(1 for ans in st.session_state.user_answers if ans["selected"] == ans["correct"])
+    total = len(st.session_state.user_answers)
+    st.markdown(f"### 正解数： {score} / {total}")
+
+    # 間違えた問題の復習
+    st.markdown("---")
+    st.markdown("### ❗ 復習（間違えた問題）")
+    for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
+        if ans["selected"] != ans["correct"]:
+            st.markdown(f"**Q{i+1}:** {q['sentence_with_blank']}")
+            st.markdown(f"- あなたの答え: {ans['selected']}")
+            st.markdown(f"- 正解: **{ans['correct']}**")
+            st.markdown(f"- 意味: {q['meaning_jp']}")
+            if pd.notna(q['sentence_jp']):
+                st.markdown(f"- 和訳: {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+
+    if st.button("もう一度挑戦"):
+        st.session_state.page = "start"
+        st.session_state.quiz = []
+        st.session_state.user_answers = []
+        st.session_state.current_q_idx = 0
+        st.rerun()
