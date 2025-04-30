@@ -34,9 +34,9 @@ if st.session_state.page == "start":
         st.session_state.quiz = quiz
         st.session_state.current_q_idx = 0
         st.session_state.user_answers = []
+        st.session_state.page = "quiz"
         st.session_state.mistake_counts = {}
         st.session_state.answered = False
-        st.session_state.page = "quiz"
         st.rerun()
 
 # クイズ画面
@@ -66,11 +66,8 @@ elif st.session_state.page == "quiz":
     if not st.session_state.answered:
         if st.button("✅ 解答する"):
             correct = current_q["answer"]
-            st.session_state.user_answers.append({
-                "selected": selected,
-                "correct": correct,
-                "word": current_q["word"]
-            })
+            st.session_state.user_answers.append({"selected": selected, "correct": correct, "word": current_q['word']})
+            st.session_state.answered = True
 
             if selected == correct:
                 st.success("正解！ 🎉")
@@ -82,22 +79,19 @@ elif st.session_state.page == "quiz":
             st.markdown(f"**意味：** {current_q['meaning_jp']}")
             sentence_jp = current_q['sentence_jp']
             if pd.notna(sentence_jp):
-                st.markdown(f"**和訳：** {sentence_jp.replace(chr(10), '<br>')}", unsafe_allow_html=True)
+                st.markdown(f"**和訳：** {sentence_jp.replace('\n', '<br>')}", unsafe_allow_html=True)
             else:
                 st.markdown("**和訳：** （和訳なし）")
 
-            st.session_state.answered = True
-            st.experimental_rerun()
-
-    if st.session_state.answered:
+    else:
         if st.button("次の問題へ"):
-            if current_idx + 1 < len(quiz):
-                st.session_state.current_q_idx += 1
-                st.session_state.answered = False
-                st.experimental_rerun()
+            st.session_state.current_q_idx += 1
+            st.session_state.answered = False
+            if st.session_state.current_q_idx < len(quiz):
+                st.rerun()
             else:
                 st.session_state.page = "review"
-                st.experimental_rerun()
+                st.rerun()
 
 # 結果画面
 elif st.session_state.page == "review":
