@@ -116,35 +116,46 @@ elif st.session_state.page == "quiz":
     random.seed(current_idx)
     choices = random.sample(choices, len(choices))
 
-    selected = st.radio("選択肢を選んでください：", choices, key=f"answer_{current_idx}",
-                        format_func=lambda x: f"🔘 {x}")
+    if "selected_choice" not in st.session_state:
+        st.session_state.selected_choice = None
+
+    selected = None
+    cols = st.columns(len(choices))
+    for i, (col, choice) in enumerate(zip(cols, choices)):
+        if col.button(choice, key=f"btn_{current_idx}_{i}"):
+            st.session_state.selected_choice = choice
 
     if not st.session_state.answered and st.button("✅ 解答する"):
-        correct = current_q["answer"]
-        st.session_state.user_answers.append({"selected": selected, "correct": correct})
-        st.session_state.answered = True
-
-        is_correct = (selected == correct)
-        save_result(st.session_state.username, correct, selected, correct, is_correct)
-
-        if is_correct:
-            st.success("正解！ 🎉")
+        if not st.session_state.selected_choice:
+            st.warning("選択肢を選んでください。")
         else:
-            st.markdown(
-                f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>",
-                unsafe_allow_html=True
-            )
+            selected = st.session_state.selected_choice
+            correct = current_q["answer"]
+            st.session_state.user_answers.append({"selected": selected, "correct": correct})
+            st.session_state.answered = True
 
-        st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        sentence_jp = current_q['sentence_jp']
-        if pd.notna(sentence_jp):
-            sentence_jp = sentence_jp.replace("\n", "<br>")
-            st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
-        else:
-            st.markdown("**和訳：** （和訳なし）")
+            is_correct = (selected == correct)
+            save_result(st.session_state.username, correct, selected, correct, is_correct)
+
+            if is_correct:
+                st.success("正解！ 🎉")
+            else:
+                st.markdown(
+                    f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>",
+                    unsafe_allow_html=True
+                )
+
+            st.markdown(f"**意味：** {current_q['meaning_jp']}")
+            sentence_jp = current_q['sentence_jp']
+            if pd.notna(sentence_jp):
+                sentence_jp = sentence_jp.replace("\n", "<br>")
+                st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
+            else:
+                st.markdown("**和訳：** （和訳なし）")
 
     if st.session_state.answered:
         if st.button("➡ 次の問題へ"):
+            st.session_state.selected_choice = None
             if current_idx + 1 < len(quiz):
                 st.session_state.current_q_idx += 1
                 st.session_state.answered = False
@@ -152,29 +163,3 @@ elif st.session_state.page == "quiz":
             else:
                 st.session_state.page = "review"
                 st.rerun()
-
-# 結果画面
-elif st.session_state.page == "review":
-    st.title("📊 結果と復習")
-    score = sum(1 for ans in st.session_state.user_answers if ans["selected"] == ans["correct"])
-    total = len(st.session_state.user_answers)
-    st.markdown(f"### 正解数： {score} / {total}")
-
-    st.markdown("---")
-    st.markdown("### ❗ 復習（間違えた問題）")
-    for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
-        if ans["selected"] != ans["correct"]:
-            st.markdown(f"**Q{i+1}:** {q['sentence_with_blank']}")
-            st.markdown(f"- あなたの答え: {ans['selected']}")
-            st.markdown(f"- 正解: **{ans['correct']}**")
-            st.markdown(f"- 意味: {q['meaning_jp']}")
-            if pd.notna(q['sentence_jp']):
-                st.markdown(f"- 和訳: {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
-
-    if st.button("🔁 もう一度挑戦"):
-        st.session_state.page = "start"
-        st.session_state.quiz = []
-        st.session_state.user_answers = []
-        st.session_state.current_q_idx = 0
-        st.session_state.answered = False
-        st.rerun()
