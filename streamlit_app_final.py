@@ -61,25 +61,27 @@ elif st.session_state.page == "quiz":
         if st.button("✅ 解答する"):
             correct = current_q["answer"]
             st.session_state.user_answers.append({
-                "selected": selected,
-                "correct": correct,
-                "word": current_q["word"]
-            })
+            "selected": selected,
+            "correct": correct,
+            "word": current_q["word"]
+        })
 
-            if selected == correct:
-                st.success("正解！ 🎉")
-            else:
-                st.markdown(f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>", unsafe_allow_html=True)
+        if selected == correct:
+            st.success("正解！ 🎉")
+        else:
+            st.markdown(f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>", unsafe_allow_html=True)
 
-            st.markdown(f"**意味：** {current_q['meaning_jp']}")
-            sentence_jp = current_q['sentence_jp']
-            if pd.notna(sentence_jp):
-                st.markdown(f"**和訳：** {sentence_jp.replace('\n', '<br>')}", unsafe_allow_html=True)
-            else:
-                st.markdown("**和訳：** （和訳なし）")
+        st.markdown(f"**意味：** {current_q['meaning_jp']}")
+        sentence_jp = current_q['sentence_jp']
+        if pd.notna(sentence_jp):
+            st.markdown(f"**和訳：** {sentence_jp.replace('\n', '<br>')}", unsafe_allow_html=True)
+        else:
+            st.markdown("**和訳：** （和訳なし）")
 
-            st.session_state.answered = True
-            st.experimental_rerun()
+        # 正答・不正答の表示後は rerun
+        st.session_state.answered = True
+        st.experimental_rerun()  # ← これで再表示し、「次の問題へ」ボタンに切り替わる
+
 
     else:
         # 解答後に「次の問題へ」を表示
