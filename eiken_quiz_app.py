@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import random
-import os
 import sqlite3
 from datetime import datetime
 
@@ -53,20 +52,10 @@ def load_user_stats(username):
         stats["accuracy"] = stats["correct_count"] / stats["total_count"]
     return stats
 
-# 復習モードの状態をセッションに保持
-if "review_mode" not in st.session_state:
-    st.session_state.review_mode = False
-
-# サイドバーにチェックボックスを表示
-st.sidebar.markdown("## モード設定")
-st.session_state.review_mode = st.sidebar.checkbox(
-    "復習モード（正答率が低い単語を優先）",
-    value=st.session_state.review_mode
-)
-
-
-# 初期化
+# データベース初期化
 init_db()
+
+# セッション状態初期化
 if "page" not in st.session_state:
     st.session_state.page = "start"
 if "quiz" not in st.session_state:
@@ -79,85 +68,93 @@ if "answered" not in st.session_state:
     st.session_state.answered = False
 if "username" not in st.session_state:
     st.session_state.username = ""
-if "selected" not in st.session_state:
-    st.session_state.selected = None
+if "review_mode" not in st.session_state:
+    st.session_state.review_mode = False
 
-# スタート画面
+# スタートページ
 if st.session_state.page == "start":
     st.title("📝 英単語クイズ")
     st.session_state.username = st.text_input("あなたの名前を入力してください：", value=st.session_state.username)
     num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
+
+    st.session_state.review_mode = st.checkbox("復習モードをオンにする（正答率が低い単語を優先）", value=st.session_state.review_mode)
 
     if st.button("スタート") and st.session_state.username.strip():
         df = load_data()
         if st.session_state.review_mode:
             stats = load_user_stats(st.session_state.username)
             if not stats.empty:
-                low_score_words = stats[stats["accuracy"] < 0.5]["word"].tolist()
-                df = df[df["answer"].isin(low_score_words + df["answer"].tolist())]
+                df["weight"] = df["answer"].apply(lambda word: 
+                    1.0 if word not in stats["word"].values else 
+                    max(0.1, 1.0 - stats.loc[stats["word"] == word, "accuracy"].values[0])
+                )
+                df = df.sample(n=num_questions, weights=df["weight"], replace=True)
+            else:
+                df = df.sample(n=num_questions)
+        else:
+            df = df.sample(n=num_questions)
 
-
-        quiz = df.sample(frac=1).head(num_questions).to_dict(orient="records")
-        st.session_state.quiz = quiz
+        st.session_state.quiz = df.to_dict(orient="records")
         st.session_state.current_q_idx = 0
         st.session_state.user_answers = []
-        st.session_state.answered = False
-        st.session_state.selected = None
         st.session_state.page = "quiz"
+        st.session_state.answered = False
         st.rerun()
 
-# クイズ画面
+# クイズページ
 elif st.session_state.page == "quiz":
     quiz = st.session_state.quiz
-    current_idx = st.session_state.current_q_idx
-    current_q = quiz[current_idx]
+    idx = st.session_state.current_q_idx
+    current_q = quiz[idx]
 
-    percent_complete = int((current_idx + 1) / len(quiz) * 100)
-    st.progress((current_idx + 1) / len(quiz), text=f"進捗: {percent_complete}%")
+    st.progress((idx + 1) / len(quiz), text=f"進捗: {int((idx + 1) / len(quiz) * 100)}%")
 
-    st.markdown(f"<b>Q{current_idx + 1}:</b><br>{current_q['sentence_with_blank']}", unsafe_allow_html=True)
+    st.markdown(f"""
+        <div style='
+            padding:15px; 
+            border-radius:10px; 
+            background-color:rgba(240, 248, 255, 0.7); 
+            color:inherit;
+        '>
+            <b>Q{idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
+        </div>
+        """, unsafe_allow_html=True)
 
     choices = current_q["choices"].split("|")
-    random.seed(current_idx)
+    random.seed(idx)
     choices = random.sample(choices, len(choices))
 
-    # ボタン式の選択肢表示
-    selected = st.session_state.get("selected")
     if not st.session_state.answered:
         for choice in choices:
-            if st.button(choice, key=f"choice_{current_idx}_{choice}"):
-                st.session_state.selected = choice
+            button_key = f"{idx}_{choice}"
+            if st.button(choice, key=button_key, use_container_width=True):
                 correct = current_q["answer"]
-                is_correct = (choice == correct)
                 st.session_state.user_answers.append({"selected": choice, "correct": correct})
                 st.session_state.answered = True
-                save_result(st.session_state.username, correct, choice, correct, is_correct)
+                save_result(st.session_state.username, correct, choice, correct, choice == correct)
                 st.rerun()
-
     else:
+        selected = st.session_state.user_answers[-1]["selected"]
         correct = current_q["answer"]
-        choice = st.session_state.selected
-        if choice == correct:
+        if selected == correct:
             st.success(f"✅ 正解！ {correct}")
         else:
-            st.error(f"❌ 不正解... 正解は **{correct}**")
+            st.error(f"❌ 不正解... 正解は {correct}")
 
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        sentence_jp = current_q.get("sentence_jp", "")
-        if pd.notna(sentence_jp):
-            st.markdown(f"**和訳：** {sentence_jp.replace(chr(10), '<br>')}", unsafe_allow_html=True)
+        if pd.notna(current_q["sentence_jp"]):
+            st.markdown(f"**和訳：** {current_q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
 
         if st.button("➡ 次の問題へ"):
-            if current_idx + 1 < len(quiz):
+            if idx + 1 < len(quiz):
                 st.session_state.current_q_idx += 1
                 st.session_state.answered = False
-                st.session_state.selected = None
                 st.rerun()
             else:
                 st.session_state.page = "review"
                 st.rerun()
 
-# 結果と復習画面
+# 結果・復習ページ
 elif st.session_state.page == "review":
     st.title("📊 結果と復習")
     score = sum(1 for ans in st.session_state.user_answers if ans["selected"] == ans["correct"])
@@ -165,7 +162,7 @@ elif st.session_state.page == "review":
     st.markdown(f"### 正解数： {score} / {total}")
 
     st.markdown("---")
-    st.markdown("### ❗ 復習（間違えた問題）")
+    st.markdown("### ❗ 間違えた問題の復習")
     for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
         if ans["selected"] != ans["correct"]:
             st.markdown(f"**Q{i+1}:** {q['sentence_with_blank']}")
@@ -176,10 +173,6 @@ elif st.session_state.page == "review":
                 st.markdown(f"- 和訳: {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
 
     if st.button("🔁 もう一度挑戦"):
-        st.session_state.page = "start"
-        st.session_state.quiz = []
-        st.session_state.user_answers = []
-        st.session_state.current_q_idx = 0
-        st.session_state.answered = False
-        st.session_state.selected = None
+        for key in st.session_state.keys():
+            del st.session_state[key]
         st.rerun()
