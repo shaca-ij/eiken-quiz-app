@@ -120,9 +120,27 @@ elif st.session_state.page == "quiz":
         </div>
         """, unsafe_allow_html=True)
 
-    choices = current_q["choices"].split("|")
-    random.seed(idx)
-    choices = random.sample(choices, len(choices))
+# 選択肢の用意
+choices = current_q["choices"].split("|")
+random.seed(current_idx)
+choices = random.sample(choices, len(choices))
+
+# CSS追加（選択肢の背景色とマージンの調整）
+st.markdown("""
+    <style>
+    .st-radio > div {
+        background-color: #e6f0ff;  /* 薄い青色の背景 */
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 20px;  /* 上側にマージン */
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 選択肢の表示
+selected = st.radio("　", choices, key=f"answer_{current_idx}",
+                    format_func=lambda x: f"🔘 {x}")
+
 
     if not st.session_state.answered:
         for choice in choices:
