@@ -53,6 +53,18 @@ def load_user_stats(username):
         stats["accuracy"] = stats["correct_count"] / stats["total_count"]
     return stats
 
+# 復習モードの状態をセッションに保持
+if "review_mode" not in st.session_state:
+    st.session_state.review_mode = False
+
+# サイドバーにチェックボックスを表示
+st.sidebar.markdown("## モード設定")
+st.session_state.review_mode = st.sidebar.checkbox(
+    "復習モード（正答率が低い単語を優先）",
+    value=st.session_state.review_mode
+)
+
+
 # 初期化
 init_db()
 if "page" not in st.session_state:
@@ -78,10 +90,12 @@ if st.session_state.page == "start":
 
     if st.button("スタート") and st.session_state.username.strip():
         df = load_data()
-        stats = load_user_stats(st.session_state.username)
-        if not stats.empty:
-            low_score_words = stats[stats["accuracy"] < 0.5]["word"].tolist()
-            df = df[df["answer"].isin(low_score_words + df["answer"].tolist())]
+        if st.session_state.review_mode:
+            stats = load_user_stats(st.session_state.username)
+            if not stats.empty:
+                low_score_words = stats[stats["accuracy"] < 0.5]["word"].tolist()
+                df = df[df["answer"].isin(low_score_words + df["answer"].tolist())]
+
 
         quiz = df.sample(frac=1).head(num_questions).to_dict(orient="records")
         st.session_state.quiz = quiz
