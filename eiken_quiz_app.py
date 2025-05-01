@@ -141,27 +141,31 @@ st.markdown("""
 selected = st.radio("　", choices, key=f"answer_{current_idx}",
                     format_func=lambda x: f"🔘 {x}")
 
-
-    if not st.session_state.answered:
-        for choice in choices:
-            button_key = f"{idx}_{choice}"
-            if st.button(choice, key=button_key, use_container_width=True):
-                correct = current_q["answer"]
-                st.session_state.user_answers.append({"selected": choice, "correct": correct})
-                st.session_state.answered = True
-                save_result(st.session_state.username, correct, choice, correct, choice == correct)
-                st.rerun()
-    else:
-        selected = st.session_state.user_answers[-1]["selected"]
+# 回答ボタン処理（インデント注意）
+if not st.session_state.answered:
+    if st.button("✅ 解答する"):
         correct = current_q["answer"]
-        if selected == correct:
-            st.success(f"✅ 正解！ {correct}")
+        st.session_state.user_answers.append({"selected": selected, "correct": correct})
+        st.session_state.answered = True
+
+        is_correct = (selected == correct)
+        save_result(st.session_state.username, correct, selected, correct, is_correct)
+
+        if is_correct:
+            st.success("正解！ 🎉")
         else:
-            st.error(f"❌ 不正解... 正解は {correct}")
+            st.markdown(
+                f"<span style='color:red; font-weight:bold;'>✖ 不正解... 正解は <u>{correct}</u></span>",
+                unsafe_allow_html=True
+            )
 
         st.markdown(f"**意味：** {current_q['meaning_jp']}")
-        if pd.notna(current_q["sentence_jp"]):
-            st.markdown(f"**和訳：** {current_q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+        sentence_jp = current_q['sentence_jp']
+        if pd.notna(sentence_jp):
+            sentence_jp = sentence_jp.replace("\n", "<br>")
+            st.markdown(f"**和訳：** {sentence_jp}", unsafe_allow_html=True)
+        else:
+            st.markdown("**和訳：** （和訳なし）")
 
         if st.button("➡ 次の問題へ"):
             if idx + 1 < len(quiz):
