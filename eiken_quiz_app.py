@@ -109,19 +109,19 @@ elif st.session_state.page == "quiz":
 
     st.progress((idx + 1) / len(quiz), text=f"進捗: {int((idx + 1) / len(quiz) * 100)}%")
 
-        st.markdown(f"""
-        <div style='
-            padding:15px; 
-            border-radius:10px; 
-            background-color:rgba(240, 248, 255, 0.7); 
-            color:inherit;
-        '>
-            <b>Q{idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='
+        padding:15px; 
+        border-radius:10px; 
+        background-color:rgba(240, 248, 255, 0.7); 
+        color:inherit;
+    '>
+        <b>Q{idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
+    </div>
+    """, unsafe_allow_html=True)
 
-    # 👇 ここで選択肢との間隔を広げます
-    st.markdown("<br>", unsafe_allow_html=True)
+    # 👇 選択肢との間隔を広げる
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
 
     choices = current_q["choices"].split("|")
