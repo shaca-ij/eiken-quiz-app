@@ -189,7 +189,13 @@ elif st.session_state.page == "review":
     for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
         if ans["selected"] != ans["correct"]:
             st.markdown(f"""
-                <div style='padding:10px; margin:10px 0; background-color:#fff8f8; border-left: 5px solid #e74c3c;'>
+                <div style='
+                    padding:10px; 
+                    margin:10px 0; 
+                    background-color:#fff8f8; 
+                    border-left: 5px solid #e74c3c;
+                    color: black;
+                '>
                     <b>Q{i+1}:</b> {q['sentence_with_blank']}<br>
                     ❌ <b>あなたの答え:</b> {ans['selected']}<br>
                     ✅ <b>正解:</b> {ans['correct']}<br>
@@ -197,6 +203,7 @@ elif st.session_state.page == "review":
                     🌐 <b>和訳:</b> {q['sentence_jp'].replace(chr(10), '<br>') if pd.notna(q['sentence_jp']) else ''}
                 </div>
             """, unsafe_allow_html=True)
+
 
     if st.button("🔁 もう一度挑戦"):
         for key in list(st.session_state.keys()):
