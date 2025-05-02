@@ -55,7 +55,7 @@ def load_user_stats(username):
 # データベース初期化
 init_db()
 
-# セッション状態初期化
+# セッション状態の初期化
 if "page" not in st.session_state:
     st.session_state.page = "start"
 if "quiz" not in st.session_state:
@@ -77,7 +77,11 @@ if st.session_state.page == "start":
     st.session_state.username = st.text_input("あなたの名前を入力してください：", value=st.session_state.username)
     num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
 
-    st.session_state.review_mode = st.checkbox("復習モードをオンにする（正答率が低い単語を優先）", value=st.session_state.review_mode)
+    # 復習モードのオン/オフ切り替え
+    st.session_state.review_mode = st.checkbox(
+        "復習モードをオンにする（正答率が低い単語を優先）", 
+        value=st.session_state.review_mode
+    )
 
     if st.button("スタート") and st.session_state.username.strip():
         df = load_data()
@@ -110,19 +114,18 @@ elif st.session_state.page == "quiz":
     st.progress((idx + 1) / len(quiz), text=f"進捗: {int((idx + 1) / len(quiz) * 100)}%")
 
     st.markdown(f"""
-    <div style='
-        padding:15px; 
-        border-radius:10px; 
-        background-color:rgba(240, 248, 255, 0.7); 
-        color:inherit;
-    '>
-        <b>Q{idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
-    </div>
-    """, unsafe_allow_html=True)
+        <div style='
+            padding:15px; 
+            border-radius:10px; 
+            background-color:rgba(240, 248, 255, 0.7); 
+            color:inherit;
+        '>
+            <b>Q{idx + 1}:</b><br>{current_q['sentence_with_blank'].replace(chr(10), '<br>')}
+        </div>
+        """, unsafe_allow_html=True)
 
-    # 👇 選択肢との間隔を広げる
-    st.markdown("<br><br>", unsafe_allow_html=True)
-
+    # 選択肢との間にスペースを挿入
+    st.markdown("<br>", unsafe_allow_html=True)
 
     choices = current_q["choices"].split("|")
     random.seed(idx)
@@ -131,6 +134,20 @@ elif st.session_state.page == "quiz":
     if not st.session_state.answered:
         for choice in choices:
             button_key = f"{idx}_{choice}"
+            button_html = f"""
+            <style>
+                div[data-testid="stButton"] > button[{button_key}] {{
+                    background-color: #e0f0ff;
+                    color: black;
+                    width: 100%;
+                    padding: 0.5em;
+                    margin: 0.3em 0;
+                    border-radius: 5px;
+                    border: 1px solid #ccc;
+                }}
+            </style>
+            """
+            st.markdown(button_html, unsafe_allow_html=True)
             if st.button(choice, key=button_key, use_container_width=True):
                 correct = current_q["answer"]
                 st.session_state.user_answers.append({"selected": choice, "correct": correct})
@@ -161,22 +178,28 @@ elif st.session_state.page == "quiz":
 # 結果・復習ページ
 elif st.session_state.page == "review":
     st.title("📊 結果と復習")
+
     score = sum(1 for ans in st.session_state.user_answers if ans["selected"] == ans["correct"])
     total = len(st.session_state.user_answers)
-    st.markdown(f"### 正解数： {score} / {total}")
+    st.markdown(f"### ✅ 正解数： {score} / {total}")
 
     st.markdown("---")
     st.markdown("### ❗ 間違えた問題の復習")
+
     for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
         if ans["selected"] != ans["correct"]:
-            st.markdown(f"**Q{i+1}:** {q['sentence_with_blank']}")
-            st.markdown(f"- あなたの答え: {ans['selected']}")
-            st.markdown(f"- 正解: **{ans['correct']}**")
-            st.markdown(f"- 意味: {q['meaning_jp']}")
-            if pd.notna(q['sentence_jp']):
-                st.markdown(f"- 和訳: {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+            st.markdown(f"""
+                <div style='padding:10px; margin:10px 0; background-color:#fff8f8; border-left: 5px solid #e74c3c;'>
+                    <b>Q{i+1}:</b> {q['sentence_with_blank']}<br>
+                    ❌ <b>あなたの答え:</b> {ans['selected']}<br>
+                    ✅ <b>正解:</b> {ans['correct']}<br>
+                    🧠 <b>意味:</b> {q['meaning_jp']}<br>
+                    🌐 <b>和訳:</b> {q['sentence_jp'].replace(chr(10), '<br>') if pd.notna(q['sentence_jp']) else ''}
+                </div>
+            """, unsafe_allow_html=True)
 
     if st.button("🔁 もう一度挑戦"):
-        for key in st.session_state.keys():
+        for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
+
