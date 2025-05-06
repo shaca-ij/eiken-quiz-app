@@ -1,47 +1,21 @@
 ﻿id,word,answer,choices,sentence_with_blank,meaning_jp,sentence_jp
-1,finish,finishes,loses|finishes|breaks|hates,She always ________ her homework before dinner.,終える,彼女はいつも夕食前に宿題を終える。
-2,invite,invite,invite|protect|explain|decide,I will ________ my friends to my birthday party.,招待する,私は誕生日パーティーに友達を招待します。
-3,borrow,borrow,borrow|lend|show|find,Can I ________ your pen for a moment?,借りる,ちょっとの間、あなたのペンを借りてもいいですか？
-4,arrive,arrive,arrive|move|wait|close,The train will ________ at the station at 6 PM.,到着する,電車は午後6時に駅に到着します。
-5,prefer,prefer,prefer|drink|mix|like,I ________ tea to coffee.,好む,私はコーヒーよりも紅茶が好きです。
-6,clean,clean,clean|open|eat|run,We need to ________ the room before the guests arrive.,掃除する,お客さんが来る前に部屋を掃除しないといけない。
-7,develop,develop,develop|protect|guess|destroy,He wants to ________ a new app.,開発する,彼は新しいアプリを開発したいと思っています。
-8,share,share,share|keep|hide|sell,Let's ________ this pizza.,分け合う,このピザを分け合いましょう。
-9,follow,follow,follow|lead|cut|make,Please ________ me.,ついてくる,私についてきてください。
-10,suggest,suggest,suggest|repair|avoid|invite,I ________ that we go early.,提案する,私は早めに行くことを提案します。
-11,fill,fill,fill|drop|change|break,Please ________ out this form.,記入する,この用紙に記入してください。
-12,vote,vote,vote|pack|save|arrange,"Each year, students at Bradley High School ________ for a student president. \nThis year, they chose a girl named Sally Burton.",投票する,毎年、
-13,deal,deal,deal|track|wish|sink,"Jason paid $700 for his new computer. 
-\nThe same computer was $900 in another store, so Jason thought he had gotten a good ________ .",取引,ジェイソンは
-14,waved,waved,traded|stepped|explained|waved,"At the soccer game, many fans from Japan ________ Japanese ﬂags in the air. There was red and white everywhere in the stadium.",取引,ジェイソンは
-15,valuable,valuable,valuable|innocent|private|familiar,"The necklace that was stolen from the jewelry store was very ________. It was worth $70,000.",取引,ジェイソンは
-16,separately,separately,separately|forever|loudly|outdoors,"A : How long has Lisa been living in Germany?
-B : About 10 years, and she just bought a house there. I think she will stay there",取引,ジェイソンは
-17,strangers,strangers,humans|strangers|rulers|patients ,"Timmy is very friendly, and he sometimes talks to people sitting next to him on the train or bus. However, his mother told him to stop talking to ________.",取引,ジェイソンは
-18,operation,operation,escalator|entrance|origin|operation,"A : Kim, what’s wrong with your leg?
-B : I broke it when I was skiing, so I had an ________ at the hospital last week.",取引,ジェイソンは
-19,geography,geography,geography|chemistry|literature|economics,"A : What’s your favorite class this year, Ellie?
-B : I really like ________. We’re learning the names of different countries and cities around the world.",取引,ジェイソンは
-20,pour,pour,lock|steal|pour|fail,Charlotte volunteered at a marathon. Her job was to ________ water into cups and hand the cups to the runners.,取引,ジェイソンは
-21,considered,considered,released | solved | considered | promoted,"Jennifer ________ moving to a new apartment in the city. However, in the end, she decided to keep living in the same apartment.",取引,ジェイソンは
-22,keep,keep,open | keep | choose | send,"Pete asked Jan not to tell anyone in the ofﬁce that he was getting married, but she could not ________ the news secret. She told one person, and soon everyone knew.",取引,ジェイソンは
-23,no longer,no longer,at once|if possible|no longer|with ease,Brenda’s company just hired two new college graduates. Brenda is happy because she is ________ the youngest employee in the company.,取引,ジェイソンは
-24,short,short,heavy|deep|cold|short,"Tony asked his sister to lend him $10 because he was ________ of money.
-",取引,ジェイソンは
-25,fell asleep,fell asleep,fell asleep|took turns|stood out|hung up,"When Diane got home after a long day at work, she tried to watch a movie.
-She was so tired that she ________ in the middle of it.",取引,ジェイソンは
-26,over,over,over|in|below|between,"When David’s dog died suddenly, it took David a long time to get ________ the shock. Finally, he began to feel better.",取引,ジェイソンは
-27,by now,by now,under control|at times|by now|in return,"A : Derrick is late.
-B : I know. He should have been here ________. I’ll call him on his cell
-phone.",取引,ジェイソンは
-28,full of,full of,pleased with|full of|absent from|based on,"The box was ________ cookies, so Carol took some. She hoped that her mother would not notice that there were fewer cookies.
-",取引,ジェイソンは
-29,,,will write|wrote|written|writing,"A : Brian, do you want to come to the gym with me tonight?
-B : Sorry, but I can’t go. I’m busy ________ my history report.
-",取引,ジェイソンは
-30,others,others,others|other|the other|such others,"Some students liked to study in a group, while ________ preferred to study
-alone.
-",取引,ジェイソンは
-31,to drive,to drive,drove | have driven | drive | to drive,"
-A : Thank you very much, Stuart. It was kind of you ________ me home. B : No problem. I’ll stop the car in front of your apartment building.
-",取引,ジェイソンは
+1,ancient,ancient,ancient|exact|responsible|unable,"Jamie visited several ________ buildings when he went to Rome. Some of them were more than 2,000 years old.",古代の,ジェイミーはローマに行ったとき、いくつかの古代の建物を訪れました。そのいくつかは2000年以上前に建てられたものでした。
+2,translate,translate,guide|throw|control|translate,Sally’s French teacher told her to read an article in a French newspaper and ________ it into English.,翻訳する,サリーのフランス語の先生は、フランス語の新聞の記事を読んで、それを英語に翻訳するように言いました。
+3,countryside,countryside,decision|experiment|countryside|image,"Henry likes living in the city because there are so many things to do there. But he also loves nature, so sometimes he goes for a drive in the ________.",田舎,ヘンリーは都市での生活が好きで、そこでできることがたくさんあるからです。でも、自然も大好きなので、ときどき田舎にドライブに行きます。
+4,tax,tax,tax|data|total|waste,"A : Is it true that the things in this store only cost 100 yen? B : Yes, but you will also need to pay ________, so they actually cost a little more.",税金,A: この店の商品は全部100円って本当？ B: はい、でも税金を払う必要があるので、実際には少し高くなります。
+5,angrily,angrily,partly|angrily|secretly|tightly,"When the bus was an hour late, one man shouted ________ at the driver. He said that he had missed an important meeting.",怒って,バスが1時間遅れたとき、1人の男性が運転手に怒って叫びました。彼は重要な会議に遅れたと言いました。
+6,rescue,rescue,weigh|produce|stamp|rescue,"Firefighters have to ________ people from buildings that are on fire. To do this, they must be strong and healthy.",救助する,消防士は火事の建物から人々を救助しなければなりません。そのためには、強く健康的でなければなりません。
+7,released,released,released|trapped|divided|invented,"John loves the singer Ann May, and he cannot wait until her new CD is ________ next week. He has been waiting for it since her last CD came out two years ago.",発売される,ジョンは歌手のアンメイが大好きで、来週彼女の新しいCDが発売されるのを待ちきれません。彼は2年前に彼女の最後のCDが出て以来、待っていました。
+8,spread,spread,spread|served|stretched|stood,"The news that Ms. Kelly, the art teacher, was going to get married ________ through the school very quickly. By lunchtime, almost all the students knew about it.",広まる,美術のケリー先生が結婚するというニュースは学校中にすぐに広まりました。昼食の時間までには、ほぼすべての生徒がそのことを知っていました。
+9,stage,stage,stage|field|court|screen,"A : I’m really nervous about acting in the play next week. B : I know you’re worried now, but you’ll feel fine as soon as you get on the ________.",舞台,A: 来週の劇で演技するのが本当に緊張するよ。 B: 今は心配かもしれないけど、舞台に上がれば大丈夫だよ。
+10,lecture,lecture,comment|shipment|lecture|furniture,"Before Diane attended Professor Miller’s ________ at the university, she was not interested in Chinese art. However, now, she wants to learn more about it.",講義,ダイアンが大学でミラー教授の講義に出席する前は、中国の芸術には興味がありませんでした。しかし、今はもっと学びたいと思っています。
+11,speaking,speaking,crying|chatting|screaming|speaking,"A : Have you heard that Andrew Robinson is going to be the new sales manager? B : Yes. Frankly ________, I don’t think he’s the best person for the job. He knows very little about sales.",率直に言うと,A: アンドリュー・ロビンソンが新しい営業マネージャーになるって聞いた？ B: はい、率直に言うと、彼がその仕事に最適な人物だとは思いません。彼は営業についてほとんど知りません。
+12,out,out,by|out|off|for,"A : Michelle, could you take ________ the garbage? There are three bags by the front door. B : OK, Mom. I’ll do it now.",出す,A: ミシェル、ゴミを出してくれる？ 玄関に3つの袋があるよ。 B: はい、ママ、今やります。
+13,make up your mind,make up your mind,mind your own business|make up your mind|keep a promise|keep the change,"A : I still can’t decide. What should I get, the pizza or the spaghetti? B : Please ________ quickly! We have to finish eating and go in 30 minutes.",決める,A: まだ決められない。ピザにすべきかスパゲティにすべきか？ B: 早く決めて！ 30分で食べ終わって出かけなきゃいけないよ。
+14,across,across,at|across|aside|along,"While Paul was walking downtown, he ________ an old friend from high school. They went for lunch together.",偶然出会う,ポールがダウンタウンを歩いているとき、高校時代の古い友人に偶然出会いました。彼らは一緒にランチに行きました。
+15,confident of,confident of,used up|derived from|similar to|confident of,"After easily beating the strongest team in the league, the coach of the baseball team was ________ winning next weekend’s game.",確信している,リーグ最強のチームを簡単に破った後、野球チームのコーチは次の週末の試合に勝つことに確信を持っていました。
+16,brought up,brought up,shown off|put down|gotten into|brought up,Wakako is the best English speaker in her company’s Tokyo office. She has a British accent because she was ________ in the United Kingdom.,育てられる,ワカコは会社の東京オフィスで最も英語が上手な人です。彼女はイギリスで育ったので、ブリティッシュアクセントがあります。
+17,turn down,turn down,look up|turn down|fill out|drop by,"A : Dad, could you please ________ the volume of the TV? I’m trying to study for a test. B : Oh, I’m sorry.",下げる,A: パパ、テレビの音量を下げてくれる？ テスト勉強してるの。 B: ああ、ごめん。
+18,much,much,too|so|very|much,"Stephanie thought she would not enjoy the movie Train Chaos, but it was ________ more exciting than she expected.",ずっと,ステファニーは映画『トレイン・カオス』を楽しくないと思っていましたが、予想していたよりもずっと興奮するものでした。
+19,learning,learning,learn|learned|learning|to learn,"A : How are your piano lessons going, Harry? B : I gave up ________ the piano last year. Now, I’m taking guitar lessons instead.",学ぶこと,A: ハリー、ピアノのレッスンはどう？ B: 去年、ピアノを学ぶのをやめたんだ。今は代わりにギターのレッスンを受けています。
+20,taken,taken,taking|to be taken|taken|to have taken,"According to a survey ________ by a major bank, an increasing number of people are worried about not having enough money in the future.",行われた,大手銀行が行った調査によると、将来お金が足りなくなることを心配する人が増えています。
