@@ -1,42 +1,41 @@
-﻿Column1,Column2,Column3,Column4,Column5,Column6,Column7
-id,word,answer,choices,sentence_with_blank,meaning_jp,sentence_jp
-1,dull,dull,dull|dramatic|natural|brave,"A: I thought the play would be more exciting. I almost fell asleep. B: I know. It was really ( ), wasn’t it?",退屈な,劇は退屈だったね。
-2,final,final,final|common|foreign|national,Keisuke has been reading a novel in Spanish for three months. He is now on the ( ) chapter of the book and only has a few pages left.,最後の,彼は今、最終章を読んでいる。
-3,avoid,avoid,protect|admit|avoid|master,"After Thomas hurt his knee in a skiing accident, his doctor told him to ( ) playing sports for at least two months.",避ける,彼は2ヶ月間スポーツを避けるように言われた。
-4,advising,advising,selecting|advising|measuring|threatening,"Susan is having a lot of trouble with her car these days, so her friends are ( ) her to sell it and buy a new one.",助言する,友達は彼女に車を売るよう助言している。
-5,storm,storm,mirror|drop|border|storm,"A: There’ll be a ( ) in the afternoon, so take your raincoat to school, Julie. B: OK, Dad. But if it rains too hard, I may need you to come and pick me up.",嵐,午後に嵐が来るらしいよ。
-6,basically,basically,especially|sharply|basically|easily,"A: Excuse me. Can you tell me the difference between these two stereo systems? B: They’re ( ) the same, but this one has slightly bigger speakers.",基本的に,基本的には同じです。
-7,fix,fix,pour|discover|cause|fix,"A: Mom, I think my camera is broken. Can you ( ) it for me? B: Hmm. No, I can’t. But I’ll take it to the camera shop later this afternoon.",修理する,母はカメラを修理に持っていくつもり。
-8,behavior,behavior,reason|design|behavior|convenience,Mrs. Andrews told John’s parents that she was worried about John’s ( ) in class.,行動,先生は彼の授業中の行動を心配している。
-9,steal,steal,solve|waste|steal|wrap,Helen saw a man trying to ( ) a bike from the parking lot.,盗む,ヘレンは自転車を盗もうとしている男を見た。
-10,diseases,diseases,matches|diseases|engines|reasons,Medical students have to study about many kinds of ( ).,病気,医学生は多くの病気について学ばなければならない。
-11,no wonder,no wonder,some help|with luck|no wonder|one thing,"A: Could you pass me my sweater, Dave? I’m a little cold. B: Well, it’s ( ) that you’re cold, Jan. The window is open.",驚くことではない,窓が開いていれば寒いのも当然だ。
-12,Along with,Along with,Along with|Because of|Near to|Less than,"A: Mrs. Rowland, what should we bring for our trip to the museum tomorrow? B: ( ) a pencil and paper to take notes, you should bring some sandwiches for lunch.",～に加えて,鉛筆と紙のほかに昼食も持ってきてください。
-13,get ready,get ready,speak up|get ready|stand out|feel sorry,"Every afternoon, Ken puts on his team uniform and his cap to ( ) for baseball practice.",準備する,ケンは野球の練習に向けて準備する。
-14,better,better,better|less|greater|fewer,"At first, Bill planned to take a taxi to the airport, but then he thought ( ) of it.",考え直す,彼はバスを使うことにした。
-15,put out,put out,put out|fall off|set up|attach to,The firefighters worked all night to ( ) the forest fire before it could damage the town.,消す,消防士たちは火事を消そうとした。
-16,show up,show up,carry out|turn on|go down|show up,"A: I wonder where Joyce is. She said she was going to be here at eight o’clock. B: She’s always late, so don’t worry about her. I’m sure she’ll ( ) in a few minutes.",現れる,彼女はもうすぐ来ると思う。
-17,for,for,for|over|off|in,"When Reika’s grandmother fell down in the train station, Reika called ( ) help.",～に向かって,助けを求めて叫んだ。
-18,locked,locked,locked|locking|is locked|to lock,"Gerry does not want anyone to come into his house, so he always keeps his front door ( ).",鍵がかかった,彼は玄関を常に施錠している。
-19,to watch,to watch,in watching|by watching|to have watched|to watch,"A: Linda, let’s watch the movie we rented. B: Sorry, but I’m too sleepy ( ) it tonight. How about tomorrow?",～するには,今夜は眠すぎて見られない。
-20,to,to,about|to|at|into,Jimmy prefers salty food ( ) sweet food.,～よりも,彼は甘い物より塩味の食べ物が好きだ。
-21,ancient,ancient,ancient|exact|responsible|unable,"Jamie visited several ( ) buildings when he went to Rome. Some of them were more than 2,000 years old.",古代の,ジェイミーは古代の建物を見学した。
-22,translate,translate,guide|throw|control|translate,Sally’s French teacher told her to read an article in a French newspaper and ( ) it into English.,翻訳する,サリーは記事を英語に訳すように言われた。
-23,countryside,countryside,decision|experiment|countryside|image,"Henry likes living in the city because there are so many things to do there. But he also loves nature, so sometimes he goes for a drive in the ( ).",田舎,彼は時々田舎へドライブに行く。
-24,tax,tax,tax|data|total|waste,"A: Is it true that the things in this store only cost 100 yen? B: Yes, but you will also need to pay ( ), so they actually cost a little more.",税金,100円に税金がかかる。
-25,angrily,angrily,partly|angrily|secretly|tightly,"When the bus was an hour late, one man shouted ( ) at the driver.",怒って,男は運転手に怒鳴った。
-26,rescue,rescue,weigh|produce|stamp|rescue,Firefighters have to ( ) people from buildings that are on fire.,救助する,消防士は人々を救助しなければならない。
-27,released,released,released|trapped|divided|invented,"John loves the singer Ann May, and he cannot wait until her new CD is ( ) next week.",発売される,ジョンはCDの発売を楽しみにしている。
-28,spread,spread,spread|served|stretched|stood,"The news that Ms. Kelly, the art teacher, was going to get married ( ) through the school very quickly.",広まった,その知らせはすぐに学校中に広まった。
-29,stage,stage,stage|field|court|screen,"A: I’m really nervous about acting in the play next week. B: I know you’re worried now, but you’ll feel fine as soon as you get on the ( ).",舞台,舞台に立てば落ち着くよ。
-30,lecture,lecture,comment|shipment|lecture|furniture,"Before Diane attended Professor Miller’s ( ) at the university, she was not interested in Chinese art.",講義,講義を聞いて中国美術に興味を持った。
-31,speaking,speaking,crying|chatting|screaming|speaking,"A: Have you heard that Andrew Robinson is going to be the new sales manager? B: Yes. Frankly ( ), I don’t think he’s the best person for the job.",率直に言えば,率直に言うと、彼は適任ではないと思う。
-32,out,out,by|out|off|for,"A: Michelle, could you take ( ) the garbage? There are three bags by the front door. B: OK, Mom. I’ll do it now.",外に,ゴミを外に出して。
-33,make up your mind,make up your mind,mind your own business|make up your mind|keep a promise|keep the change,"A: I still can’t decide. What should I get, the pizza or the spaghetti? B: Please ( ) quickly!",決める,早く決めて！
-34,across,across,at|across|aside|along,"While Paul was walking downtown, he came ( ) an old friend from high school.",偶然出会う,旧友にばったり会った。
-35,confident of,confident of,used up|derived from|similar to|confident of,"After easily beating the strongest team in the league, the coach of the baseball team was ( ) winning next weekend’s game.",自信がある,監督は次の試合の勝利に自信を持っていた。
-36,brought up,brought up,shown off|put down|gotten into|brought up,Wakako is the best English speaker in her company’s Tokyo office. She has a British accent because she was ( ) in the United Kingdom.,育てられた,彼女はイギリスで育てられた。
-37,turn down,turn down,look up|turn down|fill out|drop by,"A: Dad, could you please ( ) the volume of the TV? I’m trying to study for a test. B: Oh, I’m sorry.",音量を下げる,テレビの音を下げて。
-38,much,much,too|so|very|much,"Stephanie thought she would not enjoy the movie Train Chaos, but it was ( ) more exciting than she expected.",ずっと,想像よりずっと面白かった。
-39,learning,learning,learn|learned|learning|to learn,"A: How are your piano lessons going, Harry? B: I gave up ( ) the piano last year.",学ぶこと,去年ピアノを習うのをやめた。
-40,taken,taken,taking|to be taken|taken|to have taken,"According to a survey ( ) by a major bank, an increasing number of people are worried about not having enough money in the future.",実施された,大手銀行による調査によると…
+﻿id,word,answer,choices,sentence_with_blank,meaning_jp,sentence_jp
+1,dull,dull,dull|dramatic|natural|brave,"A: I thought the play would be more exciting. I almost fell asleep. B: I know. It was really ________, wasn’t it?",退屈な,劇は退屈だったね。
+2,final,final,final|common|foreign|national,Keisuke has been reading a novel in Spanish for three months. He is now on the ________ chapter of the book and only has a few pages left.,最後の,彼は今、最終章を読んでいる。
+3,avoid,avoid,protect|admit|avoid|master,"After Thomas hurt his knee in a skiing accident, his doctor told him to ________ playing sports for at least two months.",避ける,彼は2ヶ月間スポーツを避けるように言われた。
+4,advising,advising,selecting|advising|measuring|threatening,"Susan is having a lot of trouble with her car these days, so her friends are ________ her to sell it and buy a new one.",助言する,友達は彼女に車を売るよう助言している。
+5,storm,storm,mirror|drop|border|storm,"A: There’ll be a ________ in the afternoon, so take your raincoat to school, Julie. B: OK, Dad. But if it rains too hard, I may need you to come and pick me up.",嵐,午後に嵐が来るらしいよ。
+6,basically,basically,especially|sharply|basically|easily,"A: Excuse me. Can you tell me the difference between these two stereo systems? B: They’re ________ the same, but this one has slightly bigger speakers.",基本的に,基本的には同じです。
+7,fix,fix,pour|discover|cause|fix,"A: Mom, I think my camera is broken. Can you ________ it for me? B: Hmm. No, I can’t. But I’ll take it to the camera shop later this afternoon.",修理する,母はカメラを修理に持っていくつもり。
+8,behavior,behavior,reason|design|behavior|convenience,Mrs. Andrews told John’s parents that she was worried about John’s ________ in class.,行動,先生は彼の授業中の行動を心配している。
+9,steal,steal,solve|waste|steal|wrap,Helen saw a man trying to ________ a bike from the parking lot.,盗む,ヘレンは自転車を盗もうとしている男を見た。
+10,diseases,diseases,matches|diseases|engines|reasons,Medical students have to study about many kinds of ________.,病気,医学生は多くの病気について学ばなければならない。
+11,no wonder,no wonder,some help|with luck|no wonder|one thing,"A: Could you pass me my sweater, Dave? I’m a little cold. B: Well, it’s ________ that you’re cold, Jan. The window is open.",驚くことではない,窓が開いていれば寒いのも当然だ。
+12,Along with,Along with,Along with|Because of|Near to|Less than,"A: Mrs. Rowland, what should we bring for our trip to the museum tomorrow? B: ________ a pencil and paper to take notes, you should bring some sandwiches for lunch.",～に加えて,鉛筆と紙のほかに昼食も持ってきてください。
+13,get ready,get ready,speak up|get ready|stand out|feel sorry,"Every afternoon, Ken puts on his team uniform and his cap to ________ for baseball practice.",準備する,ケンは野球の練習に向けて準備する。
+14,better,better,better|less|greater|fewer,"At first, Bill planned to take a taxi to the airport, but then he thought ________ of it.",考え直す,彼はバスを使うことにした。
+15,put out,put out,put out|fall off|set up|attach to,The firefighters worked all night to ________ the forest fire before it could damage the town.,消す,消防士たちは火事を消そうとした。
+16,show up,show up,carry out|turn on|go down|show up,"A: I wonder where Joyce is. She said she was going to be here at eight o’clock. B: She’s always late, so don’t worry about her. I’m sure she’ll ________ in a few minutes.",現れる,彼女はもうすぐ来ると思う。
+17,for,for,for|over|off|in,"When Reika’s grandmother fell down in the train station, Reika called ________ help.",～に向かって,助けを求めて叫んだ。
+18,locked,locked,locked|locking|is locked|to lock,"Gerry does not want anyone to come into his house, so he always keeps his front door ________.",鍵がかかった,彼は玄関を常に施錠している。
+19,to watch,to watch,in watching|by watching|to have watched|to watch,"A: Linda, let’s watch the movie we rented. B: Sorry, but I’m too sleepy ________ it tonight. How about tomorrow?",～するには,今夜は眠すぎて見られない。
+20,to,to,about|to|at|into,Jimmy prefers salty food ________ sweet food.,～よりも,彼は甘い物より塩味の食べ物が好きだ。
+21,ancient,ancient,ancient|exact|responsible|unable,"Jamie visited several ________ buildings when he went to Rome. Some of them were more than 2,000 years old.",古代の,ジェイミーは古代の建物を見学した。
+22,translate,translate,guide|throw|control|translate,Sally’s French teacher told her to read an article in a French newspaper and ________ it into English.,翻訳する,サリーは記事を英語に訳すように言われた。
+23,countryside,countryside,decision|experiment|countryside|image,"Henry likes living in the city because there are so many things to do there. But he also loves nature, so sometimes he goes for a drive in the ________.",田舎,彼は時々田舎へドライブに行く。
+24,tax,tax,tax|data|total|waste,"A: Is it true that the things in this store only cost 100 yen? B: Yes, but you will also need to pay ________, so they actually cost a little more.",税金,100円に税金がかかる。
+25,angrily,angrily,partly|angrily|secretly|tightly,"When the bus was an hour late, one man shouted ________ at the driver.",怒って,男は運転手に怒鳴った。
+26,rescue,rescue,weigh|produce|stamp|rescue,Firefighters have to ________ people from buildings that are on fire.,救助する,消防士は人々を救助しなければならない。
+27,released,released,released|trapped|divided|invented,"John loves the singer Ann May, and he cannot wait until her new CD is ________ next week.",発売される,ジョンはCDの発売を楽しみにしている。
+28,spread,spread,spread|served|stretched|stood,"The news that Ms. Kelly, the art teacher, was going to get married ________ through the school very quickly.",広まった,その知らせはすぐに学校中に広まった。
+29,stage,stage,stage|field|court|screen,"A: I’m really nervous about acting in the play next week. B: I know you’re worried now, but you’ll feel fine as soon as you get on the ________.",舞台,舞台に立てば落ち着くよ。
+30,lecture,lecture,comment|shipment|lecture|furniture,"Before Diane attended Professor Miller’s ________ at the university, she was not interested in Chinese art.",講義,講義を聞いて中国美術に興味を持った。
+31,speaking,speaking,crying|chatting|screaming|speaking,"A: Have you heard that Andrew Robinson is going to be the new sales manager? B: Yes. Frankly ________, I don’t think he’s the best person for the job.",率直に言えば,率直に言うと、彼は適任ではないと思う。
+32,out,out,by|out|off|for,"A: Michelle, could you take ________ the garbage? There are three bags by the front door. B: OK, Mom. I’ll do it now.",外に,ゴミを外に出して。
+33,make up your mind,make up your mind,mind your own business|make up your mind|keep a promise|keep the change,"A: I still can’t decide. What should I get, the pizza or the spaghetti? B: Please ________ quickly!",決める,早く決めて！
+34,across,across,at|across|aside|along,"While Paul was walking downtown, he came ________ an old friend from high school.",偶然出会う,旧友にばったり会った。
+35,confident of,confident of,used up|derived from|similar to|confident of,"After easily beating the strongest team in the league, the coach of the baseball team was ________ winning next weekend’s game.",自信がある,監督は次の試合の勝利に自信を持っていた。
+36,brought up,brought up,shown off|put down|gotten into|brought up,Wakako is the best English speaker in her company’s Tokyo office. She has a British accent because she was ________ in the United Kingdom.,育てられた,彼女はイギリスで育てられた。
+37,turn down,turn down,look up|turn down|fill out|drop by,"A: Dad, could you please ________ the volume of the TV? I’m trying to study for a test. B: Oh, I’m sorry.",音量を下げる,テレビの音を下げて。
+38,much,much,too|so|very|much,"Stephanie thought she would not enjoy the movie Train Chaos, but it was ________ more exciting than she expected.",ずっと,想像よりずっと面白かった。
+39,learning,learning,learn|learned|learning|to learn,"A: How are your piano lessons going, Harry? B: I gave up ________ the piano last year.",学ぶこと,去年ピアノを習うのをやめた。
+40,taken,taken,taking|to be taken|taken|to have taken,"According to a survey ________ by a major bank, an increasing number of people are worried about not having enough money in the future.",実施された,大手銀行による調査によると…
