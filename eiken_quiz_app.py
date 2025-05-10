@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="英単語クイズ", layout="centered")  # 必ずこれを最初に！
+
 import pandas as pd
 import random
 import sqlite3
