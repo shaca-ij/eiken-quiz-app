@@ -6,6 +6,9 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
+# NumPyのバージョン確認用（デバッグ用に一時的に表示）
+st.write("numpy version:", np.__version__)
+
 st.set_page_config(page_title="英単語クイズ", layout="centered")
 
 @st.cache_data
