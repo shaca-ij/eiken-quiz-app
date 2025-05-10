@@ -4,6 +4,7 @@ import random
 import sqlite3
 from datetime import datetime
 import matplotlib.pyplot as plt
+import numpy as np
 
 st.set_page_config(page_title="英単語クイズ", layout="centered")
 
