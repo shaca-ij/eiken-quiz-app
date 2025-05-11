@@ -240,14 +240,6 @@ elif st.session_state.page == "history":
         ax.set_xticklabels(stats["word"], rotation=45, ha="right")
         st.pyplot(fig)
 
-        # 出題回数グラフ
-        st.subheader("📈 単語の出題頻度")
-        fig2, ax2 = plt.subplots(figsize=(8, 4))
-        ax2.bar(stats["word"], stats["total"], color="#f6b26b")
-        ax2.set_ylabel("出題回数")
-        ax2.set_xticklabels(stats["word"], rotation=45, ha="right")
-        st.pyplot(fig2)
-
     if st.button("⬅ ホームに戻る"):
         st.session_state.page = "start"
         st.rerun()
