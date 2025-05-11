@@ -231,13 +231,24 @@ elif st.session_state.page == "history":
             "accuracy": "正答率"
         }), use_container_width=True)
 
-        # 単語ごとの正答率グラフ
+        import matplotlib.ticker as mtick
+        import matplotlib.font_manager as fm
+
+        # 日本語フォント設定（文字化け対策）
+        plt.rcParams["font.family"] = "DejaVu Sans"
+
+        # 単語ごとの正答率グラフ（横向き）
         st.subheader("📊 単語ごとの正答率")
-        fig, ax = plt.subplots(figsize=(8, len(stats) * 0.4))  # 行数に応じて高さを自動調整
-        ax.barh(stats["word"], stats["accuracy"], color="#6fa8dc")  # 横棒グラフ
+        fig, ax = plt.subplots(figsize=(8, len(stats) * 0.4))
+
+        ax.barh(stats["word"], stats["accuracy"], color="#6fa8dc")
         ax.set_xlabel("正答率")
         ax.set_xlim(0, 1.0)
+        ax.xaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+
+        plt.tight_layout()
         st.pyplot(fig)
+
 
     if st.button("⬅ ホームに戻る"):
         st.session_state.page = "start"
