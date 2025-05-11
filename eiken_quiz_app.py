@@ -231,13 +231,12 @@ elif st.session_state.page == "history":
             "accuracy": "正答率"
         }), use_container_width=True)
 
-        # 正答率グラフ
+        # 単語ごとの正答率グラフ
         st.subheader("📊 単語ごとの正答率")
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.bar(stats["word"], stats["accuracy"], color="#6fa8dc")
-        ax.set_ylabel("正答率")
-        ax.set_ylim(0, 1.0)
-        ax.set_xticklabels(stats["word"], rotation=45, ha="right")
+        fig, ax = plt.subplots(figsize=(8, len(stats) * 0.4))  # 行数に応じて高さを自動調整
+        ax.barh(stats["word"], stats["accuracy"], color="#6fa8dc")  # 横棒グラフ
+        ax.set_xlabel("正答率")
+        ax.set_xlim(0, 1.0)
         st.pyplot(fig)
 
     if st.button("⬅ ホームに戻る"):
