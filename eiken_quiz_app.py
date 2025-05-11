@@ -237,14 +237,6 @@ elif st.session_state.page == "history":
         # 日本語フォント設定（文字化け対策）
         plt.rcParams["font.family"] = "DejaVu Sans"
 
-        import matplotlib.pyplot as plt
-        import matplotlib.ticker as mtick
-        import matplotlib.font_manager as fm
-
-        # 日本語フォントのパスを指定（Streamlit Cloudでも動作する汎用的設定）
-        # Noto Sans CJK (Google提供の日本語フォント) を使用
-        plt.rcParams['font.family'] = 'Noto Sans CJK JP'
-
         # 単語ごとの正答率グラフ（横向き）
         st.subheader("📊 単語ごとの正答率")
         fig, ax = plt.subplots(figsize=(8, len(stats) * 0.4))
