@@ -6,23 +6,141 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
+# ページ設定
 st.set_page_config(page_title="英単語クイズ", layout="centered")
 
 # 日本語フォント設定
 font_path = fm.findfont("Noto Sans JP") or "sans-serif"
 plt.rcParams["font.family"] = "Noto Sans JP" if font_path != "sans-serif" else "sans-serif"
 
+# データ読み込み
 @st.cache_data
 def load_data():
     return pd.read_csv("words.csv")
 
-# データベース接続をセッションで保持
-if "db_conn" not in st.session_state:
-    st.session_state.db_conn = sqlite3.connect("quiz_results.db")
+# データベース初期化
+def init_db():
+    conn = sqlite3.connect("quiz_results.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            timestamp TEXT,
+            word TEXT,
+            selected TEXT,
+            correct TEXT,
+            is_correct INTEGER
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# その他の関数（init_db, save_result, load_user_stats, load_all_results, compute_accuracy）は変更なし
+# 結果保存
+def save_result(user, word, selected, correct, is_correct):
+    cursor = st.session_state.db_conn.cursor()
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute('''
+        INSERT INTO results (username, timestamp, word, selected, correct, is_correct)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (user, timestamp, word, selected, correct, int(is_correct)))
+    st.session_state.db_conn.commit()
 
-# クイズページの改良
+# ユーザー統計
+@st.cache_data
+def load_user_stats(username):
+    conn = sqlite3.connect("quiz_results.db")
+    query = '''
+        SELECT word, SUM(is_correct) AS correct_count, COUNT(*) AS total_count
+        FROM results
+        WHERE username = ?
+        GROUP BY word
+    '''
+    stats = pd.read_sql_query(query, conn, params=(username,))
+    conn.close()
+    if not stats.empty:
+        stats["accuracy"] = stats["correct_count"] / stats["total_count"]
+    return stats
+
+# 全結果取得
+def load_all_results(username):
+    conn = sqlite3.connect("quiz_results.db")
+    query = '''
+        SELECT word, selected, correct, is_correct, timestamp
+        FROM results
+        WHERE username = ?
+    '''
+    df = pd.read_sql_query(query, conn, params=(username,))
+    conn.close()
+    return df
+
+# 正答率計算
+def compute_accuracy(df):
+    stats = df.groupby("word").agg(
+        total=("is_correct", "count"),
+        correct=("is_correct", "sum")
+    )
+    stats["accuracy"] = stats["correct"] / stats["total"]
+    return stats.reset_index()
+
+# セッション状態の初期化
+def initialize_session_state():
+    defaults = {
+        "page": "start",
+        "quiz": [],
+        "current_q_idx": 0,
+        "user_answers": [],
+        "answered": False,
+        "username": "",
+        "review_mode": False,
+        "db_conn": sqlite3.connect("quiz_results.db")
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+# 初期化実行
+initialize_session_state()
+init_db()
+
+# スタートページ
+if st.session_state.page == "start":
+    st.title("📝 英単語クイズ")
+    st.session_state.username = st.text_input("あなたの名前を入力してください：", value=st.session_state.username)
+    num_questions = st.slider("出題する問題数を選んでください", min_value=1, max_value=50, value=10)
+
+    st.session_state.review_mode = st.checkbox("復習モードをオンにする（正答率が低い単語を優先）", value=st.session_state.review_mode)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("スタート") and st.session_state.username.strip():
+            df = load_data()
+            if st.session_state.review_mode:
+                stats = load_user_stats(st.session_state.username)
+                if not stats.empty:
+                    df["weight"] = df["answer"].apply(lambda word: 
+                        1.0 if word not in stats["word"].values else 
+                        max(0.1, 1.0 - stats.loc[stats["word"] == word, "accuracy"].values[0])
+                    )
+                    df = df.sample(n=num_questions, weights=df["weight"], replace=True)
+                else:
+                    df = df.sample(n=num_questions)
+            else:
+                df = df.sample(n=num_questions)
+
+            st.session_state.quiz = df.to_dict(orient="records")
+            st.session_state.current_q_idx = 0
+            st.session_state.user_answers = []
+            st.session_state.page = "quiz"
+            st.session_state.answered = False
+            st.rerun()
+
+    with col2:
+        if st.button("履歴を見る"):
+            st.session_state.page = "history"
+            st.rerun()
+
+# クイズページ
 elif st.session_state.page == "quiz":
     quiz = st.session_state.quiz
     idx = st.session_state.current_q_idx
@@ -58,7 +176,12 @@ elif st.session_state.page == "quiz":
     if not st.session_state.answered:
         for choice in choices:
             button_key = f"{idx}_{choice}"
-            st.button(choice, key=button_key, use_container_width=True)
+            if st.button(choice, key=button_key, use_container_width=True):
+                correct = current_q["answer"]
+                st.session_state.user_answers.append({"selected": choice, "correct": correct})
+                st.session_state.answered = True
+                save_result(st.session_state.username, correct, choice, correct, choice == correct)
+                st.rerun()
     else:
         selected = st.session_state.user_answers[-1]["selected"]
         correct = current_q["answer"]
@@ -89,7 +212,31 @@ elif st.session_state.page == "quiz":
                 st.session_state.page = "review"
                 st.rerun()
 
-# 履歴ページのグラフ改良
+# 結果ページ
+elif st.session_state.page == "review":
+    st.title("📊 結果と復習")
+    score = sum(1 for ans in st.session_state.user_answers if ans["selected"] == ans["correct"])
+    total = len(st.session_state.user_answers)
+    st.markdown(f"### 正解数： {score} / {total}")
+
+    st.markdown("---")
+    st.markdown("### ❗ 間違えた問題の復習")
+    for i, (q, ans) in enumerate(zip(st.session_state.quiz, st.session_state.user_answers)):
+        if ans["selected"] != ans["correct"]:
+            st.markdown(f"**Q{i+1}:** {q['sentence_with_blank'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+            st.markdown(f"- あなたの答え: {ans['selected']}")
+            st.markdown(f"- 正解: **{ans['correct']}**")
+            st.markdown(f"- 意味: {q['meaning_jp']}")
+            if pd.notna(q['sentence_jp']):
+                st.markdown(f"- 和訳: {q['sentence_jp'].replace(chr(10), '<br>')}", unsafe_allow_html=True)
+
+    if st.button("🔁 もう一度挑戦"):
+        for key in st.session_state.keys():
+            if key != "db_conn":  # データベース接続は保持
+                del st.session_state[key]
+        st.rerun()
+
+# 履歴ページ
 elif st.session_state.page == "history":
     st.title("📚 過去のクイズ履歴")
 
@@ -105,6 +252,7 @@ elif st.session_state.page == "history":
             "accuracy": "正答率"
         }), use_container_width=True)
 
+        import matplotlib.ticker as mtick
         st.subheader("📊 単語ごとの正答率（正答率が低い上位10単語）")
         top_n = 10
         stats = stats.sort_values(by="accuracy").head(top_n)
@@ -121,3 +269,7 @@ elif st.session_state.page == "history":
     if st.button("⬅ ホームに戻る"):
         st.session_state.page = "start"
         st.rerun()
+
+# データベース接続の終了（アプリ終了時）
+# 注意: Streamlitでは明示的な終了は不要な場合が多いが、必要に応じて
+# st.session_state.db_conn.close()
