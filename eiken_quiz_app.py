@@ -5,6 +5,7 @@ import sqlite3
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import os
 
 # ページ設定
 st.set_page_config(page_title="英単語クイズ", layout="centered")
@@ -20,7 +21,10 @@ def load_data():
 
 # データベース初期化
 def init_db():
-    conn = sqlite3.connect("quiz_results.db")
+    db_path = "quiz_results.db"
+    # ディレクトリが存在しない場合は作成
+    os.makedirs(os.path.dirname(db_path), exist_ok=True) if os.path.dirname(db_path) else None
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS results (
@@ -38,41 +42,57 @@ def init_db():
 
 # 結果保存
 def save_result(user, word, selected, correct, is_correct):
-    cursor = st.session_state.db_conn.cursor()
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute('''
-        INSERT INTO results (username, timestamp, word, selected, correct, is_correct)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (user, timestamp, word, selected, correct, int(is_correct)))
-    st.session_state.db_conn.commit()
+    try:
+        conn = sqlite3.connect("quiz_results.db", check_same_thread=False)
+        cursor = conn.cursor()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute('''
+            INSERT INTO results (username, timestamp, word, selected, correct, is_correct)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (user, timestamp, word, selected, correct, int(is_correct)))
+        conn.commit()
+    except sqlite3.Error as e:
+        st.error(f"データベースエラー: {e}")
+    finally:
+        conn.close()
 
 # ユーザー統計
 @st.cache_data
 def load_user_stats(username):
-    conn = sqlite3.connect("quiz_results.db")
-    query = '''
-        SELECT word, SUM(is_correct) AS correct_count, COUNT(*) AS total_count
-        FROM results
-        WHERE username = ?
-        GROUP BY word
-    '''
-    stats = pd.read_sql_query(query, conn, params=(username,))
-    conn.close()
-    if not stats.empty:
-        stats["accuracy"] = stats["correct_count"] / stats["total_count"]
-    return stats
+    try:
+        conn = sqlite3.connect("quiz_results.db", check_same_thread=False)
+        query = '''
+            SELECT word, SUM(is_correct) AS correct_count, COUNT(*) AS total_count
+            FROM results
+            WHERE username = ?
+            GROUP BY word
+        '''
+        stats = pd.read_sql_query(query, conn, params=(username,))
+        if not stats.empty:
+            stats["accuracy"] = stats["correct_count"] / stats["total_count"]
+        return stats
+    except sqlite3.Error as e:
+        st.error(f"データベースエラー: {e}")
+        return pd.DataFrame()
+    finally:
+        conn.close()
 
 # 全結果取得
 def load_all_results(username):
-    conn = sqlite3.connect("quiz_results.db")
-    query = '''
-        SELECT word, selected, correct, is_correct, timestamp
-        FROM results
-        WHERE username = ?
-    '''
-    df = pd.read_sql_query(query, conn, params=(username,))
-    conn.close()
-    return df
+    try:
+        conn = sqlite3.connect("quiz_results.db", check_same_thread=False)
+        query = '''
+            SELECT word, selected, correct, is_correct, timestamp
+            FROM results
+            WHERE username = ?
+        '''
+        df = pd.read_sql_query(query, conn, params=(username,))
+        return df
+    except sqlite3.Error as e:
+        st.error(f"データベースエラー: {e}")
+        return pd.DataFrame()
+    finally:
+        conn.close()
 
 # 正答率計算
 def compute_accuracy(df):
@@ -92,8 +112,7 @@ def initialize_session_state():
         "user_answers": [],
         "answered": False,
         "username": "",
-        "review_mode": False,
-        "db_conn": sqlite3.connect("quiz_results.db")
+        "review_mode": False
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -102,6 +121,9 @@ def initialize_session_state():
 # 初期化実行
 initialize_session_state()
 init_db()
+
+# デバッグ情報
+st.write("Session State:", dict(st.session_state))  # デバッグ用
 
 # スタートページ
 if st.session_state.page == "start":
@@ -232,8 +254,7 @@ elif st.session_state.page == "review":
 
     if st.button("🔁 もう一度挑戦"):
         for key in st.session_state.keys():
-            if key != "db_conn":  # データベース接続は保持
-                del st.session_state[key]
+            del st.session_state[key]
         st.rerun()
 
 # 履歴ページ
@@ -269,7 +290,3 @@ elif st.session_state.page == "history":
     if st.button("⬅ ホームに戻る"):
         st.session_state.page = "start"
         st.rerun()
-
-# データベース接続の終了（アプリ終了時）
-# 注意: Streamlitでは明示的な終了は不要な場合が多いが、必要に応じて
-# st.session_state.db_conn.close()
